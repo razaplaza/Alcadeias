@@ -121,6 +121,7 @@ class FlatButton {
             case "accent":  this.bg := Theme.Accent, this.bgHover := Theme.AccentHi, this.fg := "FFFFFF"
             case "danger":  this.bg := Theme.Panel2, this.bgHover := Theme.Hover, this.fg := Theme.Danger
             case "nav":     this.bg := Theme.Bg, this.bgHover := Theme.Panel2, this.fg := Theme.Muted
+            case "tab":     this.bg := Theme.Bg, this.bgHover := Theme.Panel, this.fg := Theme.Muted
             default:        this.bg := Theme.Panel2, this.bgHover := Theme.Hover, this.fg := Theme.Text
         }
     }
@@ -141,6 +142,9 @@ class FlatButton {
         if (this.kind = "nav") {
             this.ctrl.SetFont("c" (on ? Theme.Text : Theme.Muted))
             this._Paint(on ? Theme.Panel2 : this.bg)
+        } else if (this.kind = "tab") {
+            this.ctrl.SetFont("c" (on ? Theme.Text : Theme.Muted))
+            this.ctrl.Redraw()
         }
     }
 

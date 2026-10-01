@@ -451,7 +451,7 @@ class Dialogs {
         f.created := item
         f.Close(true)
         Dashboard.search.Value := ""
-        Dashboard.SetCategory("script")
+        Dashboard.SetCategory("scripts")
     }
 
     static AddExistingScripts() {
@@ -475,7 +475,7 @@ class Dialogs {
         Store.Save()
         Hotkeys.Rebuild()
         Dashboard.search.Value := ""
-        Dashboard.SetCategory("script")
+        Dashboard.SetCategory("scripts")
         App.Status("Added " added " script" (added = 1 ? "" : "s") ". Turn on 'Start when Alcadeias starts' (Edit) for the ones you always want running.", "ok")
     }
 

@@ -10,7 +10,10 @@ class Dashboard {
     static lv := ""
     static search := ""
     static nav := Map()
-    static category := "all"
+    static category := "find"
+    static group := "work"
+    static lastTab := Map("work", "find", "setup", "layouts")
+    static tabs := []
     static rows := []
     static browse := ""          ; folder being browsed, "" = not browsing
     static prevWindow := 0
@@ -20,10 +23,13 @@ class Dashboard {
     static _inboxCount := 0
     static _ticks := 0
 
-    static Categories := [
-        ["all", "Home"], ["projects", "Projects"], ["files", "Files"], ["inbox", "Inbox"],
-        ["layouts", "Layouts"], ["scripts", "Scripts"], ["shortcuts", "Apps && links"]
+    ; Two places on the left, three tabs each along the top.
+    static Groups := [
+        ["work", "Work", [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"]]],
+        ["setup", "Setup", [["layouts", "Layouts"], ["scripts", "Scripts"], ["shortcuts", "Apps && links"]]]
     ]
+    static Categories := [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"],
+        ["layouts", "Layouts"], ["scripts", "Scripts"], ["shortcuts", "Apps && links"]]
     static CatTypes := Map("projects", ["project", "template"], "layouts", ["layout"],
         "scripts", ["script"], "shortcuts", ["app", "folder", "link"])
 
@@ -32,20 +38,24 @@ class Dashboard {
         Dashboard.g := g
         Theme.DarkTitle(g)
 
-        Dashboard.title := Theme.Label(g, "x24 y14 w300 h34", "Alcadeias", Theme.Text, 18, true)
-        Dashboard.summary := Theme.Label(g, "x26 y50 w700 h20", "", Theme.Muted, 9)
+        Dashboard.title := Theme.Label(g, "x24 y20 w300 h34", "Alcadeias", Theme.Text, 18, true)
+        Dashboard.summary := Theme.Label(g, "x26 y56 w700 h20", "", Theme.Warn, 9)
         Dashboard.summary.OnEvent("Click", (*) => Dashboard.ShowProblems())
         Dashboard.btn["settings"] := FlatButton(g, "x0 y20 w120 h36", "Settings", (*) => Dialogs.Settings())
         Dashboard.btn["help"] := FlatButton(g, "x0 y20 w40 h36", "?", (*) => Dashboard.ShowHelp())
         Dashboard.topLine := Theme.Line(g, 0, 84, 100, Theme.Panel)
 
-        for i, c in Dashboard.Categories {
-            b := FlatButton(g, Format("x16 y{} w168 h36", 100 + (i - 1) * 40), "", Dashboard._NavFn(c[1]), "nav")
+        for i, grp in Dashboard.Groups {
+            b := FlatButton(g, Format("x16 y{} w168 h42", 100 + (i - 1) * 46), "   " grp[2], Dashboard._GroupFn(grp[1]), "nav")
             b.ctrl.Opt("-Center")
-            Dashboard.nav[c[1]] := b
+            b.ctrl.SetFont("s11")
+            Dashboard.nav[grp[1]] := b
         }
-        Dashboard.tips := Theme.Label(g, "x24 y0 w165 h140", "", Theme.Muted, 8)
-        Dashboard.tips.Text := "Type  search all`nEnter  open   Tab  inside`nBackspace  up a folder`nCtrl+M  move   Ctrl+Z  undo`nF2  edit / rename`nCtrl+N  new   Esc  back"
+        Loop 3 {
+            t := FlatButton(g, "x0 y100 w120 h34", "", Dashboard._TabFn(A_Index), "tab")
+            Dashboard.tabs.Push(t)
+        }
+        Dashboard.tabLine := g.Add("Text", "x0 y134 w120 h2 Background" Theme.Accent)
 
         Dashboard.search := Theme.Edit(g, "x200 y100 w600 h32")
         Dashboard.search.SetFont("s11")
@@ -83,6 +93,8 @@ class Dashboard {
         Hotkey("$Backspace", (*) => Dashboard.BackspaceKey())
         Hotkey("^f", (*) => Dashboard.FocusSearch())
         Hotkey("^n", (*) => Dashboard.NewItem())
+        Hotkey("^Tab", (*) => Dashboard.CycleTab(1))
+        Hotkey("^+Tab", (*) => Dashboard.CycleTab(-1))
         Hotkey("^m", (*) => Dashboard.MoveSelected())
         Hotkey("$^z", (*) => Dashboard.UndoKey())
         Hotkey("^+c", (*) => Dashboard.CopySelectedPaths())
@@ -95,7 +107,7 @@ class Dashboard {
         HotIf()
 
         Dashboard._inboxCount := Files.InboxCount()
-        Dashboard.SetCategory("all", false)
+        Dashboard.SetCategory("find", false)
         Dashboard.Refresh()
         SetTimer(() => Dashboard.Tick(), 1500)
     }
@@ -156,10 +168,12 @@ class Dashboard {
         Dashboard.btn["settings"].Move(w - 24 - 120, 22)
         Dashboard.btn["help"].Move(w - 24 - 120 - 8 - 40, 22)
         Dashboard.topLine.Move(0, 84, w)
-        Dashboard.tips.Move(24, h - 150)
         cx := 200, cw := w - cx - 20
-        Dashboard.search.Move(cx, 100, cw, 32)
-        Dashboard.lv.Move(cx, 144, cw, h - 144 - 100)
+        for i, t in Dashboard.tabs
+            t.Move(cx + (i - 1) * 128, 100)
+        Dashboard.MoveTabLine()
+        Dashboard.search.Move(cx, 148, cw, 32)
+        Dashboard.lv.Move(cx, 190, cw, h - 190 - 100)
         by := h - 92
         Dashboard.btn["new"].Move(cx, by)
         Dashboard.btn["edit"].Move(cx + 104, by)
@@ -180,10 +194,18 @@ class Dashboard {
     ; ---- categories & browsing -------------------------------------------
 
     static SetCategory(key, refresh := true) {
+        if (key = "all" || key = "files")
+            key := "find"
         Dashboard.category := key
         Dashboard.browse := ""
+        for grp in Dashboard.Groups
+            for t in grp[3]
+                if (t[1] = key)
+                    Dashboard.group := grp[1]
+        Dashboard.lastTab[Dashboard.group] := key
         for k, b in Dashboard.nav
-            b.SetActive(k = key)
+            b.SetActive(k = Dashboard.group)
+        Dashboard.UpdateTabs()
         if refresh {
             Dashboard.search.Value := ""
             Dashboard.Refresh()
@@ -192,6 +214,45 @@ class Dashboard {
     }
 
     static _NavFn(key) => (*) => Dashboard.SetCategory(key)
+    static _GroupFn(grp) => (*) => Dashboard.SetCategory(Dashboard.lastTab[grp])
+    static _TabFn(i) => (*) => Dashboard.SetCategory(Dashboard._GroupTabs()[i][1])
+
+    static _GroupTabs() {
+        for grp in Dashboard.Groups
+            if (grp[1] = Dashboard.group)
+                return grp[3]
+        return Dashboard.Groups[1][3]
+    }
+
+    static UpdateTabs() {
+        list := Dashboard._GroupTabs()
+        for i, t in Dashboard.tabs {
+            label := list[i][2]
+            if (t.Text != label)
+                t.Text := label
+            t.SetActive(list[i][1] = Dashboard.category)
+        }
+        Dashboard.MoveTabLine()
+    }
+
+    static MoveTabLine() {
+        for i, t in Dashboard.tabs
+            if t.active {
+                t.ctrl.GetPos(&x, &y, &w, &h)
+                Dashboard.tabLine.Move(x, y + h, w, 2)
+                Dashboard.tabLine.Redraw()
+            }
+    }
+
+    static CycleTab(d) {
+        list := Dashboard._GroupTabs()
+        for i, t in list
+            if (t[1] = Dashboard.category) {
+                n := Mod(i - 1 + d + list.Length, list.Length) + 1
+                Dashboard.SetCategory(list[n][1])
+                return
+            }
+    }
 
     static BrowseTo(path) {
         if !DirExist(path)
@@ -315,30 +376,18 @@ class Dashboard {
     }
 
     static UpdateNav() {
-        counts := Map()
-        for item in Store.Items
-            counts[item["type"]] := counts.Get(item["type"], 0) + 1
-        for c in Dashboard.Categories {
-            n := ""
-            if Dashboard.CatTypes.Has(c[1]) {
-                s := 0
-                for t in Dashboard.CatTypes[c[1]]
-                    s += counts.Get(t, 0)
-                n := s ? s : ""
-            } else if (c[1] = "inbox")
-                n := Dashboard._inboxCount ? Dashboard._inboxCount : ""
-            Dashboard.nav[c[1]].Text := "   " c[2] "   " n
-        }
+        ; deliberately no counts: less to look at
     }
 
     static UpdateCue() {
         static last := ""
         cue := Dashboard.browse != "" ? "Filter " Files.Name(Dashboard.browse) "…   (Backspace = up a folder, Esc = leave)"
-            : Dashboard.category = "files" ? "Find any file or folder: recent ones first, then the whole PC"
+            : Dashboard.category = "find" ? "Find anything: projects, files and folders on the whole PC, layouts, scripts…"
             : Dashboard.category = "inbox" ? "Filter the inbox…   Ctrl+M moves the selection to a folder"
-            : "Search everything: projects, files, layouts, scripts, apps, hotkeys…"
+            : "Filter…"
         if (cue != last) {
             Theme.Cue(Dashboard.search, cue)
+            Dashboard.search.Redraw()
             last := cue
         }
     }
@@ -350,20 +399,22 @@ class Dashboard {
         cat := Dashboard.category
         if (cat = "inbox")
             return Dashboard.InboxRows(tokens)
-        if (cat = "files") {
+        ; Find with an empty box: a calm start page
+        if (cat = "find" && !tokens) {
             seen := Map()
-            for p in Places.Top(tokens ? 40 : 100, tokens)
+            if Dashboard._inboxCount
+                rows.Push({kind: "goto", target: "inbox", cols: ["", "Inbox has loose files", "Inbox", "", "Downloads + Desktop. Enter to sort them out"]})
+            for p in Projects.Recent(5)
+                rows.Push(Dashboard.ItemRow(p, Dashboard.Details(p), running))
+            for p in Places.Top(30)
                 Dashboard._AddFile(rows, seen, p["path"], p["dir"], p["last"], "recent")
-            if tokens
-                Dashboard._AddEverything(rows, seen, q, 150)
             if !rows.Length
-                rows.Push(Dashboard.Msg(tokens ? "No matches for '" Dashboard.search.Value "'"
-                    : "Nothing remembered yet. Folders you open in Explorer and files you open show up here automatically."))
+                rows.Push(Dashboard.Msg("Type to find anything. Folders and files you use show up here by themselves."))
             return rows
         }
 
-        ; items
-        types := Dashboard.CatTypes.Get(cat, "")
+        ; items (Find searches all of them)
+        types := cat = "find" ? "" : Dashboard.CatTypes.Get(cat, "")
         order := Map("project", 1, "template", 2, "layout", 3, "app", 4, "folder", 5, "link", 6, "script", 7)
         list := []
         for item in Store.Items {
@@ -384,16 +435,14 @@ class Dashboard {
         }
         Files.SortBy(list, "k")
 
-        if (cat = "all" && !tokens && Dashboard._inboxCount)
-            rows.Push({kind: "goto", target: "inbox", cols: ["", "Inbox: " Dashboard._inboxCount " loose file" (Dashboard._inboxCount = 1 ? "" : "s"), "Inbox", "", "Downloads + Desktop. Enter to sort them out"]})
         for x in list
             rows.Push(x.row)
-        if (cat = "all") {
+        if (cat = "find") {
             seen := Map()
-            for p in Places.Top(tokens ? 10 : 8, tokens)
+            for p in Places.Top(20, tokens)
                 Dashboard._AddFile(rows, seen, p["path"], p["dir"], p["last"], "recent")
-            if (tokens && StrLen(q) >= 3)
-                Dashboard._AddEverything(rows, seen, q, 25)
+            if (StrLen(q) >= 2)
+                Dashboard._AddEverything(rows, seen, q, 120)
         }
         if !rows.Length
             rows.Push(Dashboard.Msg(tokens ? "No matches for '" Dashboard.search.Value "'" : "Nothing here yet. Press + New (Ctrl+N) to add one."))
@@ -439,7 +488,7 @@ class Dashboard {
             return
         }
         static nagged := false
-        if (Dashboard.category = "files" || !nagged) {
+        if (Dashboard.category = "find" || !nagged) {
             nagged := true
             hint := Everything.LastError = "notrunning" ? "Start Everything to search the whole PC (it's installed but not running)"
                 : "Whole-PC search: set up Everything in Settings (one click)"
@@ -545,14 +594,11 @@ class Dashboard {
         Dashboard.UpdateButtons()
     }
 
+    ; The header stays empty unless something needs attention.
     static UpdateSummary(running) {
-        n := 0
-        for item in Store.OfType("script")
-            if running.Has(StrLower(item["path"]))
-                n++
-        s := n " script" (n = 1 ? "" : "s") " running  ·  " Hotkeys.Active.Count " hotkeys  ·  " Places.data.Count " places remembered"
+        s := ""
         if Hotkeys.Errors.Length
-            s .= "  ·  ! " Hotkeys.Errors.Length " hotkey problem" (Hotkeys.Errors.Length = 1 ? "" : "s") " (click)"
+            s := "! " Hotkeys.Errors.Length " hotkey problem" (Hotkeys.Errors.Length = 1 ? "" : "s") " (click to see)"
         if (Dashboard.summary.Text != s)
             Dashboard.summary.Text := s
     }
@@ -572,7 +618,7 @@ class Dashboard {
         Ctrl+Alt+D          show / hide Alcadeias (change in Settings)
 
         Finding things
-          type                 search everything (Home), any file (Files)
+          type                 Find searches everything, other tabs filter
           Enter / dbl-click    open it. If a Save/Open dialog was in front,
                                the folder or file goes into that dialog
           Tab                  look inside a folder or project
@@ -590,7 +636,8 @@ class Dashboard {
 
         Items
           F2 or Ctrl+E         edit      Ctrl+N  new      Delete  remove
-          Ctrl+1 … Ctrl+7      switch category
+          Ctrl+1 … Ctrl+6      jump to a tab
+          Ctrl+Tab             next tab
 
         Script editor
           Ctrl+S               save, check for errors, swap in the new version

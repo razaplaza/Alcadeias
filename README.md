@@ -61,12 +61,19 @@ You get a separate Claude window without tabs or an address bar, and the layout 
 
 ---
 
+## How it's organized
+
+Two places on the left, three tabs each:
+
+- **Work** (daily): **Find** (search anything) · **Inbox** (put new files away) · **Projects** (open a whole job at once; templates live here too)
+- **Setup** (configure once): **Layouts** · **Scripts** · **Apps & links**
+
 ## Your files, the low-effort way
 
 Nothing needs setting up to start, because Alcadeias learns as you go.
 
 1. **Just use your PC.** Folders you open in Explorer and files you open in any app are remembered automatically (Windows already logs them).
-2. **Ctrl+Alt+D, type, Enter.** *Home* searches everything; *Files* shows your most-used places and, with Everything, every file on the PC (newest first). If a browser's upload dialog or any Save/Open dialog was in front, Enter puts the file or folder straight into it.
+2. **Ctrl+Alt+D, type, Enter.** The *Find* tab searches everything: your projects, layouts and scripts, your most-used places and, with Everything, every file on the PC (newest first). With an empty box it shows recent projects and places. If a browser's upload dialog or any Save/Open dialog was in front, Enter puts the file or folder straight into it.
 3. **Tab** looks inside a folder or project; **Backspace** goes up; **Esc** goes back.
 4. **Inbox** shows loose files in Downloads and on the Desktop. Select one or several (Shift+Up/Down), press **Ctrl+M** and type where it goes. Next time that kind of file gets a suggestion. **Ctrl+Z** undoes a move or rename.
 
@@ -85,7 +92,7 @@ Nothing needs setting up to start, because Alcadeias learns as you go.
 | | F2 or Ctrl+E | Edit the selected item |
 | | Ctrl+N | New item |
 | | Delete | Remove the selected item |
-| | Ctrl+1 … Ctrl+7 | Switch category |
+| | Ctrl+Tab / Ctrl+1 … Ctrl+6 | Next tab / jump to a tab |
 | | Tab / Backspace | Look inside a folder / go up |
 | | Ctrl+M | Move selected file(s) to… |
 | | Ctrl+Z | Undo the last move or rename |
