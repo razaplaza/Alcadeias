@@ -16,7 +16,8 @@ One dashboard for everything that speeds up your desktop: your AutoHotkey script
 1. **Install AutoHotkey v2** from <https://www.autohotkey.com>. Alcadeias itself runs on v2.
    Your existing scripts are v1 and **don't need converting**. Alcadeias runs each script with the right version. If v1 isn't installed yet, the AutoHotkey v2 installer offers to add it, or you can grab v1.1 from the same site.
 2. **Get Alcadeias**: on GitHub press **Code → Download ZIP** and unzip it somewhere permanent, e.g. `Documents\Alcadeias`. You can also `git clone` it.
-3. Double-click **`Alcadeias.ahk`**. The dashboard opens and an icon appears in the tray.
+3. Double-click **`Start Alcadeias.cmd`**. The dashboard opens and an icon appears in the tray.
+   (Use this rather than double-clicking `Alcadeias.ahk`. If `.ahk` files open with v1 on your PC, which is normal when you have v1 scripts, v1 can't run Alcadeias. The `.cmd` always uses v2, and your v1 scripts keep opening the way they do now.)
 4. Open **Settings** and turn on **Start Alcadeias with Windows**.
 
 ## First things to do
