@@ -26,6 +26,8 @@ class Actions {
             case "folder": Actions.OpenFolder(item["path"], target)
             case "link":   Actions.OpenLink(item)
             case "script": Editor.Open(item)
+            case "project": Projects.Run(item, target)
+            case "template": Templates.Create(item)
         }
     }
 
@@ -77,6 +79,7 @@ class Actions {
             App.Status("Folder not found: " path, "error", true)
             return
         }
+        Places.Visit(path)
         cls := ""
         try cls := WinGetClass(target)
         if (cls = "#32770") {

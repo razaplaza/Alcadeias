@@ -20,6 +20,8 @@ A_MaxHotkeysPerInterval := 400
 #Include lib\Hotkeys.ahk
 #Include lib\Scripts.ahk
 #Include lib\Layouts.ahk
+#Include lib\Files.ahk
+#Include lib\Projects.ahk
 #Include lib\Actions.ahk
 #Include lib\Editor.ahk
 #Include lib\Dialogs.ahk
@@ -33,6 +35,7 @@ class App {
     static Start() {
         Theme.InitApp()
         Store.Load()
+        Places.Load()
         App.BuildTray()
         Hotkeys.Rebuild()
         Scripts.StartAutostart()

@@ -5,8 +5,9 @@ class Store {
     static File := A_ScriptDir "\data\config.json"
     static Data := ""
 
-    static Types := ["script", "layout", "app", "folder", "link"]
-    static TypeNames := Map("script", "Script", "layout", "Layout", "app", "App", "folder", "Folder", "link", "Link")
+    static Types := ["project", "template", "script", "layout", "app", "folder", "link"]
+    static TypeNames := Map("project", "Project", "template", "Template", "script", "Script", "layout", "Layout",
+        "app", "App", "folder", "Folder", "link", "Link")
 
     static Load() {
         DirCreate(Store.Dir)
@@ -44,7 +45,10 @@ class Store {
             "vdaPath", "",
             "defaultVersion", "1",
             "startWithWindows", 0,
-            "startHidden", 0
+            "startHidden", 0,
+            "everythingDll", "",
+            "everythingExclude", "!\AppData\ !\$Recycle.Bin\ !\Windows\ !\node_modules\ !\.git\ !\Program Files",
+            "inboxFolders", ["%DOWNLOADS%", "%DESKTOP%"]
         )
         for k, v in defaults
             if !d["settings"].Has(k)
@@ -82,6 +86,14 @@ class Store {
             case "link":
                 if !item.Has("target")
                     item["target"] := ""
+            case "project":
+                for k, v in Map("root", "", "open", "", "layout", "", "openFolder", 1, "lastOpened", "", "template", "")
+                    if !item.Has(k)
+                        item[k] := v
+            case "template":
+                for k, v in Map("source", "", "dest", "", "pattern", "{date} {name}", "open", "", "layout", "")
+                    if !item.Has(k)
+                        item[k] := v
         }
     }
 

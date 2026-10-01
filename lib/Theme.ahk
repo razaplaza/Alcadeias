@@ -75,8 +75,8 @@ class Theme {
     }
 
     ; Dark list view with roomy rows.
-    static ListView(g, opts, cols, rowHeight := 30) {
-        lv := g.Add("ListView", opts " -Multi -E0x200 +LV0x10000 Background" Theme.Panel, cols)
+    static ListView(g, opts, cols, rowHeight := 30, multi := false) {
+        lv := g.Add("ListView", opts (multi ? "" : " -Multi") " -E0x200 +LV0x10000 Background" Theme.Panel, cols)
         lv.SetFont("s10 c" Theme.Text, Theme.Font)
         Theme.SetTheme(lv.Hwnd, "DarkMode_Explorer")
         hdr := SendMessage(0x101F, 0, 0, lv)   ; LVM_GETHEADER

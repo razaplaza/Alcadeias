@@ -132,7 +132,21 @@ class Scripts {
 
     ; Syntax-check, then replace the running copy. If the check fails the old
     ; copy keeps running untouched. Returns true on success.
+    static _busy := Map()   ; path -> true while an apply is in progress
+
     static Apply(item, startIfStopped := true) {
+        ; the syntax check waits on a process, which lets timers (the
+        ; auto-apply watcher) run; never let two applies of one script overlap
+        key := StrLower(item["path"])
+        if Scripts._busy.Has(key)
+            return false
+        Scripts._busy[key] := true
+        try return Scripts._Apply(item, startIfStopped)
+        finally Scripts._busy.Delete(key)
+    }
+
+    static _Apply(item, startIfStopped) {
+        Scripts.MarkSeen(item)   ; this version is being handled now
         err := Scripts.Validate(item)
         if (err != "") {
             Scripts.LastError[item["id"]] := err
@@ -210,16 +224,16 @@ class Scripts {
         DirCreate(dir)
         FileCopy(item["path"], dir "\" stem "_" A_Now ".ahk", 1)
         ; keep the newest 30
-        files := []
+        backups := []
         Loop Files dir "\*.ahk"
-            files.Push(A_LoopFileFullPath)
-        if (files.Length > 30) {
+            backups.Push(A_LoopFileFullPath)
+        if (backups.Length > 30) {
             sorted := ""
-            for f in files
+            for f in backups
                 sorted .= f "`n"
             sorted := Sort(RTrim(sorted, "`n"))
             for i, f in StrSplit(sorted, "`n")
-                if (i <= files.Length - 30)
+                if (i <= backups.Length - 30)
                     try FileDelete(f)
         }
     }
@@ -247,7 +261,7 @@ class Scripts {
                 Scripts._mtimes[path] := t
                 continue
             }
-            if (Scripts._mtimes[path] = t)
+            if (Scripts._mtimes[path] = t || Scripts._busy.Has(StrLower(path)))
                 continue
             Scripts._mtimes[path] := t
             if !item["autoApply"]

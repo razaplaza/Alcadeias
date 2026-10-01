@@ -37,6 +37,8 @@ class Form {
     __New(title, owner := "", width := 640) {
         this.owner := owner
         this.width := width
+        this.colW := width
+        this.maxY := 0
         this.lx := 24, this.cx := 190
         this.cw := width - this.cx - 24
         this.y := 20
@@ -53,8 +55,25 @@ class Form {
 
     Section(text) {
         this.y += 6
-        Theme.Label(this.g, Format("x{} y{} w{} h22", this.lx, this.y, this.width - 48), text, Theme.AccentHi, 10, true)
+        Theme.Label(this.g, Format("x{} y{} w{} h22", this.lx, this.y, this.colW - 48), text, Theme.AccentHi, 10, true)
         this.y += 30
+    }
+
+    ; Start a second column to the right (for tall forms like Settings).
+    NewColumn() {
+        this.maxY := Max(this.maxY, this.y)
+        this.lx += this.colW, this.cx += this.colW
+        this.width += this.colW
+        this.y := 20
+    }
+
+    ; Multi-line text box.
+    Multi(label, value := "", rows := 4) {
+        this.Label(label)
+        h := rows * 20 + 10
+        c := Theme.Edit(this.g, Format("x{} y{} w{} h{} Multi WantReturn", this.cx, this.y, this.cw, h), value)
+        this.y += h + 10
+        return c
     }
 
     Label(text) {
@@ -104,6 +123,7 @@ class Form {
 
     Buttons(onSave, saveText := "Save") {
         this.onSave := onSave
+        this.y := Max(this.y, this.maxY)
         this.y += 10
         Theme.Line(this.g, 0, this.y, this.width, Theme.Panel)
         this.y += 16
@@ -207,9 +227,11 @@ class Dialogs {
 
     static EditItem(item, isNew) {
         switch item["type"] {
-            case "script": ok := Dialogs.Script(item)
-            case "layout": ok := Dialogs.Layout(item, isNew)
-            default:       ok := Dialogs.Simple(item, isNew)
+            case "script":   ok := Dialogs.Script(item)
+            case "layout":   ok := Dialogs.Layout(item, isNew)
+            case "project":  ok := Dialogs.Project(item, isNew)
+            case "template": ok := Dialogs.Template(item, isNew)
+            default:         ok := Dialogs.Simple(item, isNew)
         }
         if ok {
             Hotkeys.Rebuild()
@@ -433,15 +455,15 @@ class Dialogs {
     }
 
     static AddExistingScripts() {
-        files := FileSelect("M3", Store.Setting("scriptsDir"), "Add AutoHotkey scripts", "AutoHotkey (*.ahk)")
-        if !(files is Array) || !files.Length
+        picked := FileSelect("M3", Store.Setting("scriptsDir"), "Add AutoHotkey scripts", "AutoHotkey (*.ahk)")
+        if !(picked is Array) || !picked.Length
             return
         have := Map()
         for item in Store.OfType("script")
             have[StrLower(item["path"])] := true
         running := Scripts.Running()
         added := 0
-        for p in files {
+        for p in picked {
             if have.Has(StrLower(p))
                 continue
             SplitPath(p, , , , &stem)
@@ -659,11 +681,118 @@ class Dialogs {
         }
     }
 
+    ; ---- projects & templates ----------------------------------------------
+
+    static _LayoutChoices(currentId) {
+        names := ["(none)"], ids := [""], sel := 1
+        for l in Store.OfType("layout") {
+            names.Push(l["name"]), ids.Push(l["id"])
+            if (l["id"] = currentId)
+                sel := names.Length
+        }
+        return {names: names, ids: ids, sel: sel}
+    }
+
+    static Project(item, isNew) {
+        e := Store.Clone(item)
+        f := Form((isNew ? "New" : "Edit") " project", Dialogs.Owner(), 700)
+        name := f.Edit("Name", e["name"])
+        hk := f.HotkeyRow(e["hotkey"], e["id"])
+        root := f.EditBtn("Project folder", e["root"], "Browse…", (c) => Dialogs._BrowseDir(c, name))
+        openF := f.Toggle("Open the folder in Explorer", e["openFolder"])
+        opens := f.Multi("Also open", e["open"], 4)
+        f.Hint("One per line: files (relative to the project folder is fine), web links, or programs. E.g. 04_Project\Edit.prproj or https://studio.youtube.com", 2)
+        lc := Dialogs._LayoutChoices(e["layout"])
+        lay := f.DDL("Then apply layout", lc.names, lc.sel)
+        f.Hint("Optional: arrange the windows once everything is open.")
+        save := () => (
+            e["name"] := Trim(name.Value),
+            e["hotkey"] := hk.Value,
+            e["root"] := Trim(root.Value, " `t`""),
+            e["openFolder"] := openF.Value,
+            e["open"] := Trim(opens.Value, " `t`r`n"),
+            e["layout"] := lc.ids[lay.Value],
+            e["name"] = "" && e["root"] != "" ? (e["name"] := Files.Name(e["root"])) : 0,
+            e["name"] = "" ? MsgBox("Give the project a name.", "Alcadeias", "Icon!")
+                : (Dialogs._Commit(item, e, isNew), f.Close(true)))
+        f.Buttons(save)
+        name.Focus()
+        return f.ShowModal()
+    }
+
+    static Template(item, isNew) {
+        e := Store.Clone(item)
+        f := Form((isNew ? "New" : "Edit") " template", Dialogs.Owner(), 720)
+        name := f.Edit("Name", e["name"])
+        f.Hint("What you're making, e.g. Video project. Shows up as 'New Video project…'.")
+        hk := f.HotkeyRow(e["hotkey"], e["id"])
+        f.Hint("The hotkey starts a new project from this template.")
+        src := f.EditBtn("Template folder", e["source"], "Browse…", (c) => Dialogs._BrowseDir(c, name))
+        FlatButton(f.g, Format("x{} y{} w260 h28", f.cx, f.y - 4), "No folder yet? Make a starter one", (*) => (
+            p := Templates.MakeStarter(), src.Value := p, name.Value = "" ? (name.Value := "Video project") : 0,
+            Run('explorer.exe "' p '"')))
+        f.y += 34
+        f.Hint("A normal folder with the subfolders and files every project starts with (e.g. your .prproj / .aep). {name} and {date} in file names and in .md/.txt files get filled in.", 2)
+        dest := f.EditBtn("New projects go in", e["dest"], "Browse…", (c) => Dialogs._BrowseDir(c))
+        pat := f.Edit("Folder name", e["pattern"])
+        f.Hint("{name}, {date} (2026-10-01), {yyyy}, {MM}, {dd}, {month}")
+        opens := f.Multi("Also open", e["open"], 3)
+        f.Hint("Opened with every new project. One per line, e.g. 04_Project\{name}.prproj")
+        lc := Dialogs._LayoutChoices(e["layout"])
+        lay := f.DDL("Layout", lc.names, lc.sel)
+        save := () => (
+            e["name"] := Trim(name.Value),
+            e["hotkey"] := hk.Value,
+            e["source"] := Trim(src.Value, " `t`""),
+            e["dest"] := Trim(dest.Value, " `t`""),
+            e["pattern"] := Trim(pat.Value) != "" ? Trim(pat.Value) : "{name}",
+            e["open"] := Trim(opens.Value, " `t`r`n"),
+            e["layout"] := lc.ids[lay.Value],
+            e["name"] = "" ? MsgBox("Give the template a name.", "Alcadeias", "Icon!")
+                : !DirExist(Actions.Expand(e["source"])) ? MsgBox("Pick the template folder (or make a starter one).", "Alcadeias", "Icon!")
+                : (Dialogs._Commit(item, e, isNew), f.Close(true)))
+        f.Buttons(save)
+        name.Focus()
+        return f.ShowModal()
+    }
+
+    ; One-line question. Returns the text, or "" if cancelled.
+    static AskText(title, prompt, default := "") {
+        f := Form(title, Dialogs.Owner(), 520)
+        f.cx := 120, f.cw := 520 - 120 - 24
+        c := f.Edit(prompt, default)
+        result := ""
+        f.Buttons(() => (result := Trim(c.Value), f.Close(true)), "OK")
+        c.Focus()
+        SendMessage(0xB1, 0, -1, c)
+        f.ShowModal()
+        return result
+    }
+
+    static _Lines(text) {
+        out := []
+        for l in StrSplit(text, "`n", " `r`t")
+            if (l != "")
+                out.Push(l)
+        return out
+    }
+
+    static _SetupEverything(statusLabel) {
+        if !ProcessExist("Everything.exe") && !FileExist(A_ProgramFiles "\Everything\Everything.exe") {
+            if (MsgBox("Everything itself isn't installed yet. Open voidtools.com to download it?`n`n(Install it, start it, then press 'Set up for me' again.)", "Alcadeias", "YesNo Icon?") = "Yes")
+                Run("https://www.voidtools.com/downloads/")
+            return
+        }
+        statusLabel.Text := "Downloading the connector…"
+        ok := Everything.InstallSdk()
+        statusLabel.Text := ok ? Everything.StatusText() : "Download failed. Get Everything-SDK.zip from voidtools.com and put dll\Everything64.dll in Alcadeias\tools\"
+    }
+
     ; ---- settings --------------------------------------------------------
 
     static Settings() {
         st := Store.Settings
-        f := Form("Settings", Dialogs.Owner(), 720)
+        f := Form("Settings", Dialogs.Owner(), 660)
         f.Section("Alcadeias")
         hk := f.HotkeyRow(st["dashboardHotkey"], "__dashboard")
         startWin := f.Toggle("Start Alcadeias with Windows", st["startWithWindows"])
@@ -677,12 +806,29 @@ class Dialogs {
         f.Hint("Empty = the one running Alcadeias: " A_AhkPath)
         defv := f.DDL("Scripts with no #Requires", ["are v1", "are v2"], st["defaultVersion"] = "2" ? 2 : 1, 200)
 
+        f.NewColumn()
         f.Section("Files")
         ed := f.EditBtn("External editor", st["editorPath"], "Browse…", (c) => (p := FileSelect(3, , "Pick your editor", "Programs (*.exe)"), p != "" ? (c.Value := p) : 0))
         f.Hint("Empty = Notepad. VS Code is usually %LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe")
         sdir := f.EditBtn("New scripts go in", st["scriptsDir"], "Browse…", (c) => (p := DirSelect("*" c.Value, 3, "Folder for new scripts"), p != "" ? (c.Value := p) : 0))
         vdaEdit := f.EditBtn("VirtualDesktop dll", st["vdaPath"], "Browse…", (c) => (p := FileSelect(3, , "VirtualDesktopAccessor.dll", "DLL (*.dll)"), p != "" ? (c.Value := p) : 0))
         f.Hint("Optional. Lets layouts switch desktops and pull windows over from other desktops. Use the same dll your Win_Hotkeys script uses.", 2)
+
+        f.Section("Whole-PC file search (Everything)")
+        f.Label("Status")
+        evStatus := Theme.Label(f.g, Format("x{} y{} w{} h22", f.cx, f.y + 6, f.cw - 150), Everything.StatusText(), Theme.Muted)
+        FlatButton(f.g, Format("x{} y{} w140 h30", f.cx + f.cw - 140, f.y), "Set up for me", (*) => Dialogs._SetupEverything(evStatus))
+        f.y += 40
+        f.Hint("Needs the free 'Everything' app (voidtools.com) running. 'Set up for me' downloads its official search connector into tools\.", 2)
+        evEx := f.Edit("Skip paths", st["everythingExclude"])
+        f.Hint("Everything filters that keep noise out of results. !\Folder\ skips any path containing that folder.")
+
+        f.Section("Inbox")
+        inboxList := ""
+        for x in (st["inboxFolders"] is Array ? st["inboxFolders"] : [])
+            inboxList .= (inboxList = "" ? "" : "`n") x
+        inbox := f.Multi("Inbox folders", inboxList, 3)
+        f.Hint("One per line. %DOWNLOADS% and %DESKTOP% are yours; add any other dumping ground.")
 
         FlatButton(f.g, Format("x24 y{} w150 h34", f.y + 26), "Open data folder", (*) => Run('explorer.exe "' Store.Dir '"'))
         save := () => (
@@ -695,6 +841,8 @@ class Dialogs {
             st["editorPath"] := Trim(Actions.Expand(ed.Value), " `t`""),
             st["scriptsDir"] := Trim(sdir.Value, " `t`""),
             st["vdaPath"] := Trim(vdaEdit.Value, " `t`""),
+            st["everythingExclude"] := Trim(evEx.Value),
+            st["inboxFolders"] := Dialogs._Lines(inbox.Value),
             Store.Save(),
             App.ApplyStartup(),
             Hotkeys.Rebuild(),

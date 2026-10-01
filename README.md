@@ -2,6 +2,11 @@
 
 One dashboard for everything that speeds up your desktop: your AutoHotkey scripts, window layouts, apps, folders and links. Press **Ctrl+Alt+D** from anywhere to show or hide it.
 
+- **Find anything, without keeping things tidy**: Alcadeias remembers every folder you visit and every file you open, ranked by how often and how recently you used them. Type a few letters and the right place is at the top. With *Everything* installed it also searches the whole PC, newest first.
+- **Inbox**: Downloads and Desktop as a to-do list. **Ctrl+M** moves files to the right folder. It learns where each kind of file goes, suggests that next time, and **Ctrl+Z** undoes.
+- **Projects**: one item per project (its folder, files and links to open, a layout). One key or search opens all of it.
+- **Templates**: "New Video project…" copies your skeleton folder, fills in the name and date, and opens the result as a project.
+- **Browse in the dashboard**: Tab into any folder, type to filter, Backspace to go up. Newest files first.
 - **Scripts**: create, edit and run all your `.ahk` files from one place. Press **Ctrl+S** in the editor and the running copy is replaced right away. If you made a mistake, Alcadeias shows the error and the line, and **the old version keeps running**.
 - **Layouts**: one hotkey puts a set of apps in exact positions across your monitors (for example Obsidian on the left half of monitor 1, Claude on the right half, YouTube Studio fullscreen on monitor 2). Apps that aren't open get launched first.
 - **Apps**: focus-or-launch hotkeys. Press `Alt+O` and Obsidian comes to the front, or opens if it's closed.
@@ -56,6 +61,19 @@ You get a separate Claude window without tabs or an address bar, and the layout 
 
 ---
 
+## Your files, the low-effort way
+
+Nothing needs setting up to start, because Alcadeias learns as you go.
+
+1. **Just use your PC.** Folders you open in Explorer and files you open in any app are remembered automatically (Windows already logs them).
+2. **Ctrl+Alt+D, type, Enter.** *Home* searches everything; *Files* shows your most-used places and, with Everything, every file on the PC (newest first). If a browser's upload dialog or any Save/Open dialog was in front, Enter puts the file or folder straight into it.
+3. **Tab** looks inside a folder or project; **Backspace** goes up; **Esc** goes back.
+4. **Inbox** shows loose files in Downloads and on the Desktop. Select one or several (Shift+Up/Down), press **Ctrl+M** and type where it goes. Next time that kind of file gets a suggestion. **Ctrl+Z** undoes a move or rename.
+
+**Whole-PC search (recommended):** install the free [Everything](https://www.voidtools.com/downloads/) app, then Settings → *Set up for me*. That downloads Everything's official search connector into `tools\`.
+
+**Templates:** + New → Template… → *Make a starter one* creates `data\templates\Video project` (footage/audio/graphics/project/exports/thumbnails + a notes file). Drop your `.prproj` / `.aep` templates into it, and name files with `{name}` / `{date}` to have them filled in. Set *New projects go in* to where your projects live. After that, + New → New Video project… asks for a name and does the rest.
+
 ## Keys
 
 | Where | Key | Does |
@@ -67,8 +85,13 @@ You get a separate Claude window without tabs or an address bar, and the layout 
 | | F2 or Ctrl+E | Edit the selected item |
 | | Ctrl+N | New item |
 | | Delete | Remove the selected item |
-| | Ctrl+1 … Ctrl+6 | Switch category |
-| | Esc | Clear the search, then hide |
+| | Ctrl+1 … Ctrl+7 | Switch category |
+| | Tab / Backspace | Look inside a folder / go up |
+| | Ctrl+M | Move selected file(s) to… |
+| | Ctrl+Z | Undo the last move or rename |
+| | Ctrl+R / Ctrl+Shift+C | Show in Explorer / copy path |
+| | Shift+Up/Down | Select several |
+| | Esc | Clear the search, leave a folder, then hide |
 | | Right-click a row | More: duplicate, show file, backups, … |
 | Dialogs | Enter / Esc | Save / cancel |
 | Script editor | **Ctrl+S** | Save, check for errors, swap in the new version |
@@ -101,9 +124,6 @@ data\                your setup + backups (created on first run, not in git)
 scripts\             default home for new scripts (not in git)
 ```
 
-## Ideas for later
+## Coming next
 
-- Templates tab (project folder skeletons, `.prproj` templates, text snippets)
-- Downloads sorter rules
-- Workspaces: one hotkey that opens a project's folder, files and layout together
-- Razer macro keyboard bindings managed in the dashboard
+Snippets, clipboard history, Razer key map, a daily start routine, window tools (throw to other monitor, snap, always on top), a hotkey map page, backup/sync, usage stats and auto-sort rules for the inbox.
