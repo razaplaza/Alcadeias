@@ -122,6 +122,7 @@ lib\                 the app (Dashboard, Editor, Layouts, Scripts, ...)
 assets\              icon
 data\                your setup + backups (created on first run, not in git)
 scripts\             default home for new scripts (not in git)
+tools\               Everything search connector, once set up (not in git)
 ```
 
 ## Coming next
