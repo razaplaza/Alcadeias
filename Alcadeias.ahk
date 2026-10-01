@@ -22,6 +22,9 @@ A_MaxHotkeysPerInterval := 400
 #Include lib\Layouts.ahk
 #Include lib\Files.ahk
 #Include lib\Projects.ahk
+#Include lib\Rules.ahk
+#Include lib\Paste.ahk
+#Include lib\KeyMap.ahk
 #Include lib\Actions.ahk
 #Include lib\Editor.ahk
 #Include lib\Dialogs.ahk
@@ -36,10 +39,13 @@ class App {
         Theme.InitApp()
         Store.Load()
         Places.Load()
+        Clips.Load()
         App.BuildTray()
         Hotkeys.Rebuild()
         Scripts.StartAutostart()
         SetTimer(() => Scripts.Watch(), 1000)
+        Rules.Start()
+        OnMessage(0x4A, ObjBindMethod(App, "_OnCopyData"))
         Dashboard.Build()
         hidden := Store.Setting("startHidden")
         for arg in A_Args
@@ -92,6 +98,23 @@ class App {
         WinSetTransparent(235, g)
         SetTimer(App._DestroyGui.Bind(App, g), -3500)
     }
+
+    ; "Alcadeias Run.ahk" (and anything else) can run an item by name.
+    static _OnCopyData(wParam, lParam, *) {
+        text := StrGet(NumGet(lParam, 2 * A_PtrSize, "Ptr"))
+        if (SubStr(text, 1, 4) != "run:")
+            return false
+        want := Trim(SubStr(text, 5))
+        for item in Store.Items
+            if (item["id"] = want || item["name"] = want) {
+                SetTimer(App._RunFn(item["id"]), -1)   ; don't keep the sender waiting
+                return true
+            }
+        App.Status("No item named '" want "'", "warn", true)
+        return true
+    }
+
+    static _RunFn(id) => (*) => Actions.FromHotkey(id)
 
     static _DestroyGui(gui) {
         try gui.Destroy()

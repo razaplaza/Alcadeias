@@ -28,6 +28,7 @@ class Actions {
             case "script": Editor.Open(item)
             case "project": Projects.Run(item, target)
             case "template": Templates.Create(item)
+            case "snippet": Clips.PasteText(Clips.Expand(item["text"]), target)
         }
     }
 

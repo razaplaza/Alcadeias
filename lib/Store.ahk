@@ -5,9 +5,9 @@ class Store {
     static File := A_ScriptDir "\data\config.json"
     static Data := ""
 
-    static Types := ["project", "template", "script", "layout", "app", "folder", "link"]
+    static Types := ["project", "template", "script", "layout", "app", "folder", "link", "snippet"]
     static TypeNames := Map("project", "Project", "template", "Template", "script", "Script", "layout", "Layout",
-        "app", "App", "folder", "Folder", "link", "Link")
+        "app", "App", "folder", "Folder", "link", "Link", "snippet", "Snippet")
 
     static Load() {
         DirCreate(Store.Dir)
@@ -36,6 +36,12 @@ class Store {
             d["settings"] := Map()
         if !(d.Get("items", "") is Array)
             d["items"] := []
+        if !(d.Get("rules", "") is Array)
+            d["rules"] := []
+        for r in d["rules"]
+            for k, v in Rules.New()
+                if !r.Has(k)
+                    r[k] := v
         defaults := Map(
             "dashboardHotkey", "^!d",
             "ahkV1Path", "",
@@ -48,7 +54,10 @@ class Store {
             "startHidden", 0,
             "everythingDll", "",
             "everythingExclude", "!\AppData\ !\$Recycle.Bin\ !\Windows\ !\node_modules\ !\.git\ !\Program Files",
-            "inboxFolders", ["%DOWNLOADS%", "%DESKTOP%"]
+            "inboxFolders", ["%DOWNLOADS%", "%DESKTOP%"],
+            "pasteHotkey", "^!v",
+            "saveClipboard", 1,
+            "autoSort", 1
         )
         for k, v in defaults
             if !d["settings"].Has(k)
@@ -88,6 +97,10 @@ class Store {
                     item["target"] := ""
             case "project":
                 for k, v in Map("root", "", "open", "", "layout", "", "openFolder", 1, "lastOpened", "", "template", "")
+                    if !item.Has(k)
+                        item[k] := v
+            case "snippet":
+                for k, v in Map("text", "", "abbr", "")
                     if !item.Has(k)
                         item[k] := v
             case "template":

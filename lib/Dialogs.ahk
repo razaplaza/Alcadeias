@@ -113,7 +113,7 @@ class Form {
     }
 
     Hint(text, lines := 1) {
-        lines := Max(lines, Ceil(StrLen(text) * 5.4 / this.cw))   ; rough wrap estimate for 8pt text
+        lines := Max(lines, Ceil(StrLen(text) * 6 / this.cw))   ; rough wrap estimate for 8pt text
         this.y -= 8
         Theme.Label(this.g, Format("x{} y{} w{} h{}", this.cx, this.y, this.cw, lines * 17), text, Theme.Muted, 8)
         this.y += lines * 17 + 8
@@ -167,10 +167,10 @@ class Form {
 
 ; Hotkey input: type AHK syntax, or press Record and hit the combo.
 class HotkeyField {
-    __New(form, value, exceptId) {
+    __New(form, value, exceptId, label := "Hotkey") {
         this.exceptId := exceptId
         g := form.g
-        form.Label("Hotkey")
+        form.Label(label)
         this.edit := Theme.Edit(g, Format("x{} y{} w170 h30", form.cx, form.y), value)
         SendMessage(0xD3, 1, 8, this.edit)
         this.rec := FlatButton(g, Format("x{} y{} w100 h30", form.cx + 178, form.y), "● Record", (*) => this.DoRecord())
@@ -231,6 +231,7 @@ class Dialogs {
             case "layout":   ok := Dialogs.Layout(item, isNew)
             case "project":  ok := Dialogs.Project(item, isNew)
             case "template": ok := Dialogs.Template(item, isNew)
+            case "snippet":  ok := Dialogs.Snippet(item, isNew)
             default:         ok := Dialogs.Simple(item, isNew)
         }
         if ok {
@@ -542,13 +543,16 @@ class Dialogs {
         }
     }
 
-    static _MoveSlot(slots, lv, d) {
+    static _MoveSlot(slots, lv, d, refill := "") {
         i := lv.GetNext(0)
         j := i + d
         if (!i || j < 1 || j > slots.Length)
             return
         t := slots[i], slots[i] := slots[j], slots[j] := t
-        Dialogs._FillSlots(lv, slots)
+        if refill
+            refill.Call()
+        else
+            Dialogs._FillSlots(lv, slots)
         lv.Modify(j, "Select Focus")
     }
 
@@ -788,15 +792,149 @@ class Dialogs {
         statusLabel.Text := ok ? Everything.StatusText() : "Download failed. Get Everything-SDK.zip from voidtools.com and put dll\Everything64.dll in Alcadeias\tools\"
     }
 
+    ; ---- snippets ----------------------------------------------------------
+
+    static Snippet(item, isNew) {
+        e := Store.Clone(item)
+        f := Form((isNew ? "New" : "Edit") " snippet", Dialogs.Owner(), 720)
+        name := f.Edit("Name", e["name"])
+        abbr := f.Edit("Abbreviation", e["abbr"], 200)
+        f.Hint("Optional. Type it anywhere and it turns into the text, e.g. `;desc or `;sig. Starting with `; avoids accidents.")
+        hk := f.HotkeyRow(e["hotkey"], e["id"])
+        text := f.Multi("Text", e["text"], 9)
+        text.SetFont("s10", Theme.Mono)
+        f.Hint("{date}, {time} and {clipboard} get filled in when it's pasted.")
+        save := () => (
+            e["name"] := Trim(name.Value),
+            e["abbr"] := Trim(abbr.Value),
+            e["hotkey"] := hk.Value,
+            e["text"] := text.Value,
+            e["name"] = "" ? (e["name"] := Clips.Preview(e["text"], 30)) : 0,
+            e["text"] = "" ? MsgBox("The snippet has no text.", "Alcadeias", "Icon!")
+                : Dialogs._AbbrTaken(e) ? MsgBox("Another snippet already uses '" e["abbr"] "'.", "Alcadeias", "Icon!")
+                : (Dialogs._Commit(item, e, isNew), f.Close(true)))
+        f.Buttons(save)
+        name.Focus()
+        return f.ShowModal()
+    }
+
+    static _AbbrTaken(e) {
+        if (e["abbr"] = "")
+            return false
+        for it in Store.OfType("snippet")
+            if (it["id"] != e["id"] && it["abbr"] == e["abbr"])
+                return true
+        return false
+    }
+
+    ; ---- inbox rules ---------------------------------------------------------
+
+    static Rules() {
+        ruleList := Store.Clone(Store.Data["rules"])
+        f := Form("Inbox auto-sort", Dialogs.Owner(), 860)
+        Theme.Label(f.g, Format("x24 y{} w812 h40", f.y), "Rules tidy Downloads and Desktop for you. The first rule that matches a file wins. Automatic rules run as files arrive (after they finish downloading). The others run when you press Sort now.", Theme.Muted, 9)
+        f.y += 46
+        autoOn := Toggle(f.g, Format("x24 y{} w600 h26", f.y), "Run automatic rules in the background", Store.Setting("autoSort", 1))
+        f.y += 34
+        lv := Theme.ListView(f.g, Format("x24 y{} w812 h260", f.y), ["#", "Rule", "Files", "Then", "When"], 28)
+        lv.ModifyCol(1, 32), lv.ModifyCol(2, 200), lv.ModifyCol(3, 160), lv.ModifyCol(4, 290), lv.ModifyCol(5, 100)
+        f.y += 270
+        fill := () => Dialogs._FillRules(lv, ruleList)
+        sel := () => lv.GetNext(0)
+        by := f.y
+        FlatButton(f.g, Format("x24 y{} w110 h32", by), "+  Add rule", (*) => (
+            r := Rules.New(), Dialogs.EditRule(r, f.g, false) ? (ruleList.Push(r), fill()) : 0))
+        FlatButton(f.g, Format("x142 y{} w70 h32", by), "Edit", (*) => (
+            i := sel(), i ? (Dialogs.EditRule(ruleList[i], f.g, false), fill()) : 0))
+        FlatButton(f.g, Format("x220 y{} w84 h32", by), "Remove", (*) => (
+            i := sel(), i ? (ruleList.RemoveAt(i), fill()) : 0), "danger")
+        FlatButton(f.g, Format("x312 y{} w46 h32", by), "Up", (*) => Dialogs._MoveSlot(ruleList, lv, -1, fill))
+        FlatButton(f.g, Format("x366 y{} w56 h32", by), "Down", (*) => Dialogs._MoveSlot(ruleList, lv, 1, fill))
+        FlatButton(f.g, Format("x{} y{} w150 h32", 836 - 150, by), "Sort now", (*) => (
+            Store.Data["rules"] := Store.Clone(ruleList), Store.Save(),
+            n := Rules.Run(), App.Status("Sorted " n " file" (n = 1 ? "" : "s"), "ok")))
+        lv.OnEvent("DoubleClick", (*) => (i := sel(), i ? (Dialogs.EditRule(ruleList[i], f.g, false), fill()) : 0))
+        f.y += 42
+        f.Hint("Tip: right-click a file in the Inbox for 'Always move .mp4 files to …', a rule in one click.", 1)
+        fill()
+        save := () => (
+            Store.Data["rules"] := ruleList,
+            Store.Settings["autoSort"] := autoOn.Value,
+            Store.Save(),
+            f.Close(true),
+            Dashboard.Refresh())
+        f.Buttons(save)
+        return f.ShowModal()
+    }
+
+    static _FillRules(lv, list) {
+        lv.Delete()
+        for i, r in list
+            lv.Add(, i, r["name"] != "" ? r["name"] : "(unnamed)", r["match"], Rules.Describe(r), !r["enabled"] ? "off" : r["auto"] ? "automatic" : "Sort now")
+    }
+
+    ; Edits rule r in place. standalone = save straight into the config.
+    static EditRule(r, owner, standalone) {
+        e := Store.Clone(r)
+        f := Form("Rule", owner, 700)
+        name := f.Edit("Name", e["name"])
+        match := f.Edit("Files", e["match"])
+        f.Hint("Extensions like mp4 mov, or name patterns like IMG_* or *invoice*. * = any file.")
+        labels := [], ai := 1
+        for i, a in Rules.Actions {
+            labels.Push(a[2])
+            if (a[1] = e["action"])
+                ai := i
+        }
+        act := f.DDL("Then", labels, ai)
+        dest := f.EditBtn("Folder", e["dest"], "Pick…", (c) => (d := Picker.Choose("Where should these go?", "", f.g), d != "" ? (c.Value := d) : 0))
+        f.Hint("For unzip: where the unzipped folder goes (empty = next to the .zip).")
+        older := f.Edit("Only after (days)", e["olderDays"], 80)
+        f.Hint("0 = right away. E.g. 'Recycle * after 30 days' keeps Downloads from piling up.")
+        auto := f.Toggle("Run automatically as files arrive", e["auto"])
+        enabled := f.Toggle("Rule is on", e["enabled"])
+        ok := false
+        save := () => (
+            e["name"] := Trim(name.Value),
+            e["match"] := Trim(match.Value),
+            e["action"] := Rules.Actions[act.Value][1],
+            e["dest"] := Trim(dest.Value, " `t`""),
+            e["olderDays"] := IsInteger(Trim(older.Value)) ? Integer(Trim(older.Value)) : 0,
+            e["auto"] := auto.Value,
+            e["enabled"] := enabled.Value,
+            e["name"] = "" ? (e["name"] := e["match"] " → " (e["action"] = "recycle" ? "Recycle" : e["dest"] != "" ? Files.Name(e["dest"]) : "unzip")) : 0,
+            e["match"] = "" ? MsgBox("Say which files, e.g. mp4 mov.", "Alcadeias", "Icon!")
+                : e["action"] = "move" && e["dest"] = "" ? MsgBox("Pick the folder these files go to.", "Alcadeias", "Icon!")
+                : (ok := true, f.Close(true)))
+        f.Buttons(save)
+        name.Focus()
+        f.ShowModal()
+        if ok {
+            for k, v in e
+                r[k] := v
+            if standalone {
+                Store.Data["rules"].Push(r)
+                Store.Save()
+                App.Status("Rule saved. Inbox → Auto-sort… shows all rules.", "ok")
+            }
+        }
+        return ok
+    }
+
     ; ---- settings --------------------------------------------------------
 
     static Settings() {
         st := Store.Settings
         f := Form("Settings", Dialogs.Owner(), 660)
         f.Section("Alcadeias")
-        hk := f.HotkeyRow(st["dashboardHotkey"], "__dashboard")
+        hk := HotkeyField(f, st["dashboardHotkey"], "__dashboard", "Open Alcadeias")
         startWin := f.Toggle("Start Alcadeias with Windows", st["startWithWindows"])
         startHidden := f.Toggle("Start hidden (open with the hotkey or the tray icon)", st["startHidden"])
+
+        f.Section("Paste")
+        pasteHk := HotkeyField(f, st["pasteHotkey"], "__paste", "Paste hotkey")
+        saveClip := f.Toggle("Remember clipboard history after restarts", st["saveClipboard"])
+        f.Hint("Kept in data\clipboard.json. Copies from password managers are never recorded.")
 
         f.Section("AutoHotkey")
         v1 := f.EditBtn("v1 interpreter", st["ahkV1Path"], "Browse…", (c) => (p := FileSelect(3, , "AutoHotkey v1 (AutoHotkeyU64.exe)", "Programs (*.exe)"), p != "" ? (c.Value := p) : 0))
@@ -842,6 +980,8 @@ class Dialogs {
             st["scriptsDir"] := Trim(sdir.Value, " `t`""),
             st["vdaPath"] := Trim(vdaEdit.Value, " `t`""),
             st["everythingExclude"] := Trim(evEx.Value),
+            st["pasteHotkey"] := pasteHk.Value,
+            st["saveClipboard"] := saveClip.Value,
             st["inboxFolders"] := Dialogs._Lines(inbox.Value),
             Store.Save(),
             App.ApplyStartup(),

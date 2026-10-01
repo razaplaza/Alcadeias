@@ -493,7 +493,7 @@ class Files {
     }
 
     ; Moves files/folders into dest. Returns number moved. Undo with Files.Undo().
-    static Move(paths, dest) {
+    static Move(paths, dest, appendUndo := false, quiet := false) {
         dest := RTrim(dest, "\")
         if !DirExist(dest) {
             App.Status("Folder not found: " dest, "error")
@@ -515,8 +515,15 @@ class Files {
             } catch
                 failed++
         }
-        if batch.Length
-            Files._undo := batch
+        if batch.Length {
+            if appendUndo
+                for b in batch
+                    Files._undo.Push(b)
+            else
+                Files._undo := batch
+        }
+        if quiet
+            return batch.Length
         msg := "Moved " batch.Length " item" (batch.Length = 1 ? "" : "s") " to " Files.Name(dest)
         if failed
             msg .= " (" failed " failed: in use?)"
@@ -545,7 +552,7 @@ class Files {
         return to
     }
 
-    static Recycle(paths) {
+    static Recycle(paths, quiet := false) {
         n := 0
         for p in paths
             try {
@@ -553,7 +560,8 @@ class Files {
                 Places.Forget(p)
                 n++
             }
-        App.Status("Moved " n " item" (n = 1 ? "" : "s") " to the Recycle Bin", "ok")
+        if !quiet
+            App.Status("Moved " n " item" (n = 1 ? "" : "s") " to the Recycle Bin", "ok")
         return n
     }
 

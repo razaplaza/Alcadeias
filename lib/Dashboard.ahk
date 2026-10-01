@@ -25,12 +25,12 @@ class Dashboard {
 
     ; Two places on the left, three tabs each along the top.
     static Groups := [
-        ["work", "Work", [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"]]],
+        ["work", "Work", [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"], ["paste", "Paste"]]],
         ["setup", "Setup", [["layouts", "Layouts"], ["scripts", "Scripts"], ["shortcuts", "Apps && links"]]]
     ]
-    static Categories := [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"],
+    static Categories := [["find", "Find"], ["inbox", "Inbox"], ["projects", "Projects"], ["paste", "Paste"],
         ["layouts", "Layouts"], ["scripts", "Scripts"], ["shortcuts", "Apps && links"]]
-    static CatTypes := Map("projects", ["project", "template"], "layouts", ["layout"],
+    static CatTypes := Map("projects", ["project", "template"], "layouts", ["layout"], "paste", ["snippet"],
         "scripts", ["script"], "shortcuts", ["app", "folder", "link"])
 
     static Build() {
@@ -51,7 +51,7 @@ class Dashboard {
             b.ctrl.SetFont("s11")
             Dashboard.nav[grp[1]] := b
         }
-        Loop 3 {
+        Loop 4 {
             t := FlatButton(g, "x0 y100 w120 h34", "", Dashboard._TabFn(A_Index), "tab")
             Dashboard.tabs.Push(t)
         }
@@ -133,6 +133,11 @@ class Dashboard {
         Dashboard.FocusSearch()
     }
     static _shownOnce := false
+
+    static ShowTab(key) {
+        Dashboard.Show()
+        Dashboard.SetCategory(key)
+    }
 
     static Hide() {
         if Dashboard.g
@@ -227,11 +232,18 @@ class Dashboard {
     static UpdateTabs() {
         list := Dashboard._GroupTabs()
         for i, t in Dashboard.tabs {
+            if (i > list.Length) {
+                t.Visible := false
+                t.SetActive(false)
+                continue
+            }
             label := list[i][2]
             if (t.Text != label)
                 t.Text := label
+            t.Visible := true
             t.SetActive(list[i][1] = Dashboard.category)
         }
+        Dashboard.btn["new"].Text := Dashboard.category = "inbox" ? "Auto-sort…" : "+  New"
         Dashboard.MoveTabLine()
     }
 
@@ -372,7 +384,7 @@ class Dashboard {
     static _RowKey(r) {
         if !r
             return ""
-        return r.kind = "item" ? "i:" r.item["id"] : r.HasOwnProp("path") ? "p:" StrLower(r.path) : ""
+        return r.kind = "item" ? "i:" r.item["id"] : r.HasOwnProp("path") ? "p:" StrLower(r.path) : r.kind = "clip" ? "c:" SubStr(r.text, 1, 200) : ""
     }
 
     static UpdateNav() {
@@ -384,6 +396,7 @@ class Dashboard {
         cue := Dashboard.browse != "" ? "Filter " Files.Name(Dashboard.browse) "…   (Backspace = up a folder, Esc = leave)"
             : Dashboard.category = "find" ? "Find anything: projects, files and folders on the whole PC, layouts, scripts…"
             : Dashboard.category = "inbox" ? "Filter the inbox…   Ctrl+M moves the selection to a folder"
+            : Dashboard.category = "paste" ? "Search snippets and everything you copied…   Enter pastes it where you were"
             : "Filter…"
         if (cue != last) {
             Theme.Cue(Dashboard.search, cue)
@@ -399,6 +412,8 @@ class Dashboard {
         cat := Dashboard.category
         if (cat = "inbox")
             return Dashboard.InboxRows(tokens)
+        if (cat = "paste")
+            return Dashboard.PasteRows(tokens, running)
         ; Find with an empty box: a calm start page
         if (cat = "find" && !tokens) {
             seen := Map()
@@ -459,7 +474,10 @@ class Dashboard {
     static Msg(text) => ({kind: "msg", cols: ["", text, "", "", ""]})
 
     static ItemRow(item, details, running) {
-        return {kind: "item", item: item, cols: [Hotkeys.Pretty(item["hotkey"]), item["name"],
+        key := Hotkeys.Pretty(item["hotkey"])
+        if (key = "" && item["type"] = "snippet")
+            key := item["abbr"]
+        return {kind: "item", item: item, cols: [key, item["name"],
             Store.TypeNames[item["type"]], Dashboard.StatusOf(item, running), details]}
     }
 
@@ -494,6 +512,24 @@ class Dashboard {
                 : "Whole-PC search: set up Everything in Settings (one click)"
             rows.Push({kind: "goto", target: "settings", cols: ["", hint, "Tip", "", ""]})
         }
+    }
+
+    ; Snippets first, then clipboard history (newest first).
+    static PasteRows(tokens, running) {
+        rows := []
+        for item in Store.OfType("snippet") {
+            if tokens && !Files.MatchAll(StrLower(item["name"] " " item["abbr"] " " item["text"]), tokens)
+                continue
+            rows.Push(Dashboard.ItemRow(item, Dashboard.Details(item), running))
+        }
+        for x in Clips.history {
+            if tokens && !Files.MatchAll(StrLower(x.text), tokens)
+                continue
+            rows.Push({kind: "clip", text: x.text, cols: ["", Clips.Preview(x.text), "Copied", Files.Age(x.time), Clips.LineInfo(x.text)]})
+        }
+        if !rows.Length
+            rows.Push(Dashboard.Msg(tokens ? "Nothing matches" : "Copy something (Ctrl+C anywhere) and it shows up here. + New makes a reusable snippet."))
+        return rows
     }
 
     static BrowseRows(tokens) {
@@ -546,6 +582,8 @@ class Dashboard {
             case "project":
                 extra := item["layout"] != "" && Store.ById(item["layout"]) ? " · layout " Store.ById(item["layout"])["name"] : ""
                 return item["root"] extra
+            case "snippet":
+                return (item["abbr"] != "" ? "type " item["abbr"] "   ·   " : "") Clips.Preview(item["text"], 120)
             case "template":
                 return "→ " (item["dest"] != "" ? item["dest"] : "next to the template") " · " item["source"]
         }
@@ -625,6 +663,10 @@ class Dashboard {
           Backspace            up one folder (when the search box is empty)
           Esc                  clear search, leave folder, then hide
 
+        Paste (Ctrl+Alt+V)
+          Enter                paste into the window you came from
+          F2                   save a copied item as a snippet
+
         Files
           Ctrl+M               move selected file(s) to… (learns where things go)
           Ctrl+Z               undo the last move / rename
@@ -636,7 +678,7 @@ class Dashboard {
 
         Items
           F2 or Ctrl+E         edit      Ctrl+N  new      Delete  remove
-          Ctrl+1 … Ctrl+6      jump to a tab
+          Ctrl+1 … Ctrl+7      jump to a tab
           Ctrl+Tab             next tab
 
         Script editor
@@ -705,6 +747,8 @@ class Dashboard {
                     switch item["type"] {
                         case "script":
                             running := Scripts.IsRunning(item)
+                            if (KeyMap.IniFor(item) != "")
+                                acts.Push(["Key map", () => KeyMap.Open(item)])
                             acts.Push(["Edit code", () => Editor.Open(item)])
                             acts.Push([running ? "Reload" : "Start", () => (Scripts.Apply(item), Dashboard.RefreshSoon())])
                             if running
@@ -720,6 +764,9 @@ class Dashboard {
                             acts.Push(["Edit template files", () => Dashboard.BrowseInto()])
                         case "app":
                             acts.Push(["Focus / open", () => Dashboard.RunSelected()])
+                        case "snippet":
+                            acts.Push(["Paste", () => Dashboard.RunSelected()])
+                            acts.Push(["Copy", () => Clips.CopyText(Clips.Expand(item["text"]))])
                         case "folder":
                             acts.Push(["Open", () => Dashboard.RunSelected()])
                             acts.Push(["Look inside  Tab", () => Dashboard.BrowseInto()])
@@ -741,6 +788,12 @@ class Dashboard {
                         acts.Push(["Move to…", () => Dashboard.MoveSelected()])
                         acts.Push(["Show in folder", () => Dashboard.RevealSelected()])
                     }
+                case "clip":
+                    t := r.text
+                    del := "Forget"
+                    acts.Push(["Paste", () => Dashboard.RunSelected()])
+                    acts.Push(["Copy", () => Clips.CopyText(t)])
+                    acts.Push(["Save as snippet", () => Dashboard.SaveClip(t)])
                 case "goto":
                     acts.Push(["Go", () => Dashboard.RunSelected()])
             }
@@ -797,6 +850,8 @@ class Dashboard {
         }
         if (r.kind = "file")
             Files.Open(r.path, target)
+        else if (r.kind = "clip")
+            Clips.PasteText(r.text, target)
         else
             Actions.Run(r.item, target)
     }
@@ -853,6 +908,14 @@ class Dashboard {
     }
 
     static NewItem() {
+        if (Dashboard.category = "inbox" && Dashboard.browse = "") {
+            Dialogs.Rules()
+            return
+        }
+        if (Dashboard.category = "paste") {
+            Dialogs.EditItem(Store.NewItem("snippet"), true)
+            return
+        }
         m := Menu()
         tpls := Store.OfType("template")
         if tpls.Length {
@@ -867,6 +930,7 @@ class Dashboard {
         m.Add("App (focus or launch)…", (*) => Dialogs.EditItem(Store.NewItem("app"), true))
         m.Add("Folder shortcut…", (*) => Dialogs.EditItem(Store.NewItem("folder"), true))
         m.Add("Link / file / command…", (*) => Dialogs.EditItem(Store.NewItem("link"), true))
+        m.Add("Snippet (saved text)…", (*) => Dialogs.EditItem(Store.NewItem("snippet"), true))
         m.Add()
         m.Add("New script…", (*) => Dialogs.NewScript())
         m.Add("Add existing .ahk files…", (*) => Dialogs.AddExistingScripts())
@@ -898,6 +962,10 @@ class Dashboard {
             Dialogs.EditItem(r.item, false)
             return
         }
+        if (r.kind = "clip") {
+            Dashboard.SaveClip(r.text)
+            return
+        }
         if (r.kind = "file") {
             newName := Dialogs.AskText("Rename", "New name:", Files.Name(r.path))
             if (newName = "" || newName = Files.Name(r.path))
@@ -919,6 +987,13 @@ class Dashboard {
         r := Dashboard.SelectedRow()
         if !r
             return
+        if (r.kind = "clip") {
+            for x in Dashboard.SelectedRows()
+                if (x.kind = "clip")
+                    Clips.Remove(x.text)
+            Dashboard.Refresh()
+            return
+        }
         if (r.kind = "file") {
             paths := Dashboard.SelectedFiles()
             if (r.src = "recent") {
@@ -956,6 +1031,19 @@ class Dashboard {
         r := Dashboard.rows[row]
         if (r.kind = "msg" || r.kind = "goto")
             return
+        if (r.kind = "clip") {
+            Dashboard.lv.Modify(0, "-Select"), Dashboard.lv.Modify(row, "Select Focus")
+            t := r.text
+            m := Menu()
+            m.Add("Paste", (*) => Dashboard.RunSelected())
+            m.Add("Copy", (*) => Clips.CopyText(t))
+            m.Add("Save as snippet…", (*) => Dashboard.SaveClip(t))
+            m.Add()
+            m.Add("Forget this", (*) => Dashboard.DeleteSelected())
+            m.Add("Clear all history…", (*) => (MsgBox("Clear the whole clipboard history? Snippets stay.", "Alcadeias", "YesNo Icon? Owner" Dashboard.g.Hwnd) = "Yes" ? (Clips.Clear(), Dashboard.Refresh()) : 0))
+            m.Show()
+            return
+        }
         if !(Dashboard.lv.GetNext(row - 1) = row) {
             Dashboard.lv.Modify(0, "-Select")
             Dashboard.lv.Modify(row, "Select Focus")
@@ -976,6 +1064,14 @@ class Dashboard {
                 m.Add("Add as folder shortcut", (*) => Dashboard._AddFolderShortcut(p))
             }
             m.Add()
+            if (r.src = "inbox" && !r.dir) {
+                ext := Files.Ext(p)
+                sug := Places.Suggest(p, 1)
+                m.Add()
+                if sug.Length
+                    m.Add("Always move ." ext " files to " Files.Name(sug[1]), Dashboard._QuickRuleFn(ext, sug[1]))
+                m.Add("Make a rule for ." ext " files…", (*) => Dialogs.EditRule(Rules.New(ext), Dashboard.g, true))
+            }
             if (r.src = "recent")
                 m.Add("Forget from recent", (*) => Dashboard.DeleteSelected())
             else
@@ -1004,6 +1100,25 @@ class Dashboard {
         m.Add("Duplicate", (*) => Dashboard.Duplicate(item))
         m.Add("Remove", (*) => Dashboard.DeleteSelected())
         m.Show()
+    }
+
+    static _QuickRuleFn(ext, dest) => (*) => Dashboard.QuickRule(ext, dest)
+
+    static QuickRule(ext, dest) {
+        r := Rules.New(ext, dest)
+        r["name"] := "." ext " → " Files.Name(dest)
+        r["auto"] := 1
+        Store.Data["rules"].Push(r)
+        Store.Save()
+        n := Rules.Run()
+        App.Status("New rule: ." ext " files go to " Files.Name(dest) " automatically" (n ? " (" n " sorted now)" : ""), "ok")
+        Dashboard.Refresh()
+    }
+
+    static SaveClip(text) {
+        item := Store.NewItem("snippet", Clips.Preview(text, 30))
+        item["text"] := text
+        Dialogs.EditItem(item, true)
     }
 
     static _AddFolderShortcut(p) {

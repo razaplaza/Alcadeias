@@ -4,6 +4,9 @@ One dashboard for everything that speeds up your desktop: your AutoHotkey script
 
 - **Find anything, without keeping things tidy**: Alcadeias remembers every folder you visit and every file you open, ranked by how often and how recently you used them. Type a few letters and the right place is at the top. With *Everything* installed it also searches the whole PC, newest first.
 - **Inbox**: Downloads and Desktop as a to-do list. **Ctrl+M** moves files to the right folder. It learns where each kind of file goes, suggests that next time, and **Ctrl+Z** undoes.
+- **Auto-sort**: rules like "`mp4 mov` → Footage", "`zip` → unzip", "anything older than 30 days → Recycle Bin", run automatically or on demand. Right-click an inbox file for a one-click "always move .mp4 files here".
+- **Paste** (**Ctrl+Alt+V**): your saved snippets and the last 100 things you copied, searchable. Enter pastes into the window you came from. Snippets can have abbreviations: type `;desc` anywhere and it becomes your full video description. Copies from password managers are never recorded.
+- **Razer key map**: your macro keyboard's `macros.ini` as a proper editor (Setup → Scripts → your Razer script → *Key map*). A key can also run any Alcadeias item.
 - **Projects**: one item per project (its folder, files and links to open, a layout). One key or search opens all of it.
 - **Templates**: "New Video project…" copies your skeleton folder, fills in the name and date, and opens the result as a project.
 - **Browse in the dashboard**: Tab into any folder, type to filter, Backspace to go up. Newest files first.
@@ -65,7 +68,7 @@ You get a separate Claude window without tabs or an address bar, and the layout 
 
 Two places on the left, three tabs each:
 
-- **Work** (daily): **Find** (search anything) · **Inbox** (put new files away) · **Projects** (open a whole job at once; templates live here too)
+- **Work** (daily): **Find** (search anything) · **Inbox** (put new files away; *Auto-sort…* holds the rules) · **Projects** (open a whole job at once; templates live here too) · **Paste** (snippets + clipboard history)
 - **Setup** (configure once): **Layouts** · **Scripts** · **Apps & links**
 
 ## Your files, the low-effort way
@@ -86,6 +89,8 @@ Nothing needs setting up to start, because Alcadeias learns as you go.
 | Where | Key | Does |
 |---|---|---|
 | Anywhere | **Ctrl+Alt+D** | Show / hide Alcadeias (change it in Settings) |
+| Anywhere | **Ctrl+Alt+V** | Paste: snippets and clipboard history |
+| Anywhere | a snippet's abbreviation | Types the snippet, e.g. `;sig` |
 | Dashboard | just type | Search everything |
 | | ↑ ↓ PgUp PgDn | Pick a row |
 | | **Enter** / double-click | Run it (layout applies, app focuses, folder opens; a script opens in the editor) |
@@ -109,6 +114,16 @@ Nothing needs setting up to start, because Alcadeias learns as you go.
 A **script's own hotkey** (set via Edit) turns that script on and off, like your `F8::Suspend`, but for any script.
 
 ---
+
+## Run an item from anywhere
+
+Any program that can run a command (Razer Synapse, a Stream Deck, a desktop shortcut, another script) can trigger an Alcadeias item by name:
+
+```
+"C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" "C:\path\to\Alcadeias\Alcadeias Run.ahk" "Writing"
+```
+
+The Razer key map writes this for you when you choose *Run an Alcadeias item*.
 
 ## Good to know
 
@@ -134,4 +149,4 @@ tools\               Everything search connector, once set up (not in git)
 
 ## Coming next
 
-Snippets, clipboard history, Razer key map, a daily start routine, window tools (throw to other monitor, snap, always on top), a hotkey map page, backup/sync, usage stats and auto-sort rules for the inbox.
+A daily start routine, window tools (throw to other monitor, snap, always on top), a hotkey map page, backup/sync and usage stats.

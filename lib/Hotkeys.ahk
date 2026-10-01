@@ -14,6 +14,9 @@ class Hotkeys {
         dh := Store.Setting("dashboardHotkey")
         if (dh != "")
             wanted[dh] := (*) => Dashboard.Toggle()
+        ph := Store.Setting("pasteHotkey")
+        if (ph != "" && !wanted.Has(ph))
+            wanted[ph] := (*) => Dashboard.ShowTab("paste")
         for item in Store.Items {
             hk := item["hotkey"]
             if (hk = "")
@@ -28,6 +31,7 @@ class Hotkeys {
             if !wanted.Has(hk)
                 try Hotkey(hk, "Off")
         Hotkeys.Active := Map()
+        Snippets.Rebuild()
         for hk, cb in wanted {
             try {
                 Hotkey(hk, cb, "On")
@@ -166,6 +170,8 @@ class Hotkeys {
         n := Hotkeys.Normalize(hk)
         if (exceptId != "__dashboard" && Hotkeys.Normalize(Store.Setting("dashboardHotkey")) = n)
             out.Push("the dashboard hotkey")
+        if (exceptId != "__paste" && Hotkeys.Normalize(Store.Setting("pasteHotkey")) = n)
+            out.Push("the Paste hotkey")
         for item in Store.Items {
             if (item["id"] = exceptId)
                 continue
