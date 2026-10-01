@@ -359,32 +359,80 @@ class Layouts {
                 continue
             url := Layouts.BrowserUrl(slot["_hwnd"])
             slot["_url"] := url
-            slot["launch"] .= " --new-window" (url != "" ? ' "' url '"' : "")
+            ; without an address, a launch would only open an empty window
+            slot["launch"] := url != "" ? slot["launch"] ' --new-window "' url '"' : ""
         }
         if active
             try WinActivate(active)
         return out
     }
 
-    ; Address-bar URL of a browser window (focuses it briefly; clipboard is restored).
+    ; Address-bar URL of a browser window. Reads it through UI Automation (no
+    ; keystrokes); falls back to Ctrl+L / Ctrl+C with the clipboard restored.
     static BrowserUrl(hwnd) {
+        url := ""
+        try url := Layouts._UrlViaUIA(hwnd)
+        if (url = "")
+            url := Layouts._UrlViaKeys(hwnd)
+        return Layouts.NormalizeUrl(url)
+    }
+
+    ; The address bar often hides the scheme ("claude.ai/code", "C:/Users/...").
+    static NormalizeUrl(url) {
+        url := Trim(url)
+        if (url = "" || InStr(url, " ") || InStr(url, "`n"))
+            return ""
+        if RegExMatch(url, "^[A-Za-z]:[/\\]")
+            return "file:///" StrReplace(url, "\", "/")
+        if RegExMatch(url, "i)^([a-z][\w+.-]*://|about:|chrome:|data:|mailto:)")
+            return url
+        if RegExMatch(url, "^[\w-]+(\.[\w-]+)+(:\d+)?(/|$)") || RegExMatch(url, "i)^localhost(:\d+)?(/|$)")
+            return "https://" url
+        return ""
+    }
+
+    static _UrlViaUIA(hwnd) {
+        uia := ComObject("{ff48dba4-60ef-4201-aa87-54103eef594e}", "{30cbe57d-d9d0-452a-ab13-7ac5ac4825ee}")
+        el := 0, cond := 0, addr := 0, url := ""
+        try {
+            ComCall(6, uia, "Ptr", hwnd, "Ptr*", &el)                     ; ElementFromHandle
+            v := Buffer(24, 0)
+            NumPut("UShort", 3, v, 0), NumPut("Int", 50004, v, 8)       ; VT_I4, Edit control type
+            ComCall(23, uia, "Int", 30003, "Ptr", v, "Ptr*", &cond)      ; CreatePropertyCondition(ControlType)
+            ComCall(5, el, "Int", 4, "Ptr", cond, "Ptr*", &addr)         ; FindFirst(Descendants) = address bar
+            if addr {
+                out := Buffer(24, 0)
+                ComCall(10, addr, "Int", 30045, "Ptr", out)              ; GetCurrentPropertyValue(Value)
+                if (NumGet(out, 0, "UShort") = 8)                          ; VT_BSTR
+                    url := StrGet(NumGet(out, 8, "Ptr"), "UTF-16")
+                DllCall("oleaut32\VariantClear", "Ptr", out)
+            }
+        }
+        for p in [addr, cond, el]
+            if p
+                ObjRelease(p)
+        return url
+    }
+
+    static _UrlViaKeys(hwnd) {
         saved := ClipboardAll()
         A_Clipboard := ""
         url := ""
         try {
             WinActivate(hwnd)
-            if WinWaitActive(hwnd, , 1) {
-                Send("^l")
-                Sleep(120)
-                Send("^c")
-                if ClipWait(0.6)
+            if WinWaitActive(hwnd, , 2) {
+                Sleep(150)
+                Send("{Ctrl down}l{Ctrl up}")
+                Sleep(250)
+                Send("{Ctrl down}c{Ctrl up}")
+                if ClipWait(1)
                     url := Trim(A_Clipboard)
                 Send("{Esc}")
-                Sleep(60)
+                Sleep(80)
             }
         }
         A_Clipboard := saved
-        return (RegExMatch(url, "i)^[a-z][\w+.-]*:\S+$")) ? url : ""
+        return url
     }
 
     ; Part of a browser title that won't change much: site names usually come

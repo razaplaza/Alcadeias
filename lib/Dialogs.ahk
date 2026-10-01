@@ -125,7 +125,16 @@ class Form {
         return this.result
     }
 
+    ; Bring the dialog back to front, unless it was closed meanwhile.
+    Activate() {
+        if !this.HasOwnProp("closed")
+            try WinActivate(this.g)
+    }
+
     Close(result) {
+        if this.HasOwnProp("closed")
+            return
+        this.closed := true
         this.result := result
         if Form.Open.Has(this.g.Hwnd)
             Form.Open.Delete(this.g.Hwnd)
@@ -491,7 +500,7 @@ class Dialogs {
             e["hotkey"] := hk.Value,
             e["desktop"] := desk.Value - 1,
             e["minimizeOthers"] := minim.Value)
-        test := () => (collect(), Layouts.Apply(e), WinActivate(f.g))
+        test := () => (collect(), Layouts.Apply(e), f.Activate())
         save := () => (collect(),
             e["name"] = "" ? MsgBox("Give the layout a name.", "Alcadeias", "Icon!")
                 : (Dialogs._Commit(item, e, isNew), f.Close(true)))
@@ -621,7 +630,7 @@ class Dialogs {
             pos := s["state"] != "normal" ? Layouts.StateLabel(s["state"])
                 : s["zone"] != "custom" ? Layouts.ZoneLabel(s["zone"])
                 : Format("{}/{}/{}/{} %", s["x"], s["y"], s["w"], s["h"])
-            opens := s.Has("_url") ? (s["_url"] != "" ? s["_url"] : "new browser window (address not read)") : s["launch"]
+            opens := s.Has("_url") ? (s["_url"] != "" ? s["_url"] : "! couldn't read the address: edit this window afterwards and add it") : s["launch"]
             lv.Add("Check", s["exe"], s["title"], "M" s["monitor"], pos, opens)
         }
         f.y += 310
