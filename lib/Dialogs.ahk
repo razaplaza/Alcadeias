@@ -613,15 +613,16 @@ class Dialogs {
             return false
         }
         f := Form("Capture screen", owner, 820)
-        Theme.Label(f.g, Format("x24 y{} w772 h40", f.y), "These are the windows on screen right now. Untick any you don't want. Arrange them how you like first — positions are saved as % of the monitor.", Theme.Muted, 9)
+        Theme.Label(f.g, Format("x24 y{} w772 h40", f.y), "These are the windows on screen right now. Untick any you don't want. Each one gets a 'launch if closed' command, so the layout can open everything by itself later. Edit a window afterwards to change it.", Theme.Muted, 9)
         f.y += 46
-        lv := Theme.ListView(f.g, Format("x24 y{} w772 h300 Checked", f.y), ["App", "Window title", "Title match", "Monitor", "Position"], 26)
-        lv.ModifyCol(1, 120), lv.ModifyCol(2, 260), lv.ModifyCol(3, 140), lv.ModifyCol(4, 60), lv.ModifyCol(5, 170)
+        lv := Theme.ListView(f.g, Format("x24 y{} w772 h300 Checked", f.y), ["App", "Title match", "Monitor", "Position", "Opens if closed"], 26)
+        lv.ModifyCol(1, 110), lv.ModifyCol(2, 120), lv.ModifyCol(3, 60), lv.ModifyCol(4, 140), lv.ModifyCol(5, 330)
         for s in found {
             pos := s["state"] != "normal" ? Layouts.StateLabel(s["state"])
                 : s["zone"] != "custom" ? Layouts.ZoneLabel(s["zone"])
                 : Format("{}/{}/{}/{} %", s["x"], s["y"], s["w"], s["h"])
-            lv.Add("Check", s["exe"], s["_title"], s["title"], "M" s["monitor"], pos)
+            opens := s.Has("_url") ? (s["_url"] != "" ? s["_url"] : "new browser window (address not read)") : s["launch"]
+            lv.Add("Check", s["exe"], s["title"], "M" s["monitor"], pos, opens)
         }
         f.y += 310
         replace := Toggle(f.g, Format("x24 y{} w500 h26", f.y), "Replace the layout's current windows (otherwise add to them)", slots.Length = 0)
@@ -642,7 +643,9 @@ class Dialogs {
         row := 0
         while (row := lv.GetNext(row, "Checked")) {
             s := found[row]
-            s.Delete("_title"), s.Delete("_hwnd")
+            for k in ["_title", "_hwnd", "_url"]
+                if s.Has(k)
+                    s.Delete(k)
             slots.Push(s)
         }
     }

@@ -274,12 +274,16 @@ class Layouts {
         }
 
         ; freshly launched apps often restore their own saved position a moment later
+        ; freshly launched apps (Obsidian, Chrome) like to restore their own saved
+        ; size a moment after opening, so put them back twice
         if launched.Length {
-            Sleep(900)
-            for hwnd, i in used
-                for li in launched
-                    if (li = i)
-                        try Layouts.Place(hwnd, slots[i])
+            for wait in [1000, 2000] {
+                Sleep(wait)
+                for hwnd, i in used
+                    for li in launched
+                        if (li = i)
+                            try Layouts.Place(hwnd, slots[i])
+            }
         }
 
         if item["minimizeOthers"] {
@@ -339,17 +343,56 @@ class Layouts {
                     "exe", exe, "monitor", mon, "state", state,
                     "x", px, "y", py, "w", pw, "h", ph,
                     "zone", Layouts.MatchZone(px, py, pw, ph)))
-                if Layouts.Browsers.Has(StrLower(exe)) {
-                    slot["title"] := Layouts.CleanTitle(exe, title)
-                    slot["launch"] := path != "" ? '"' path '" --new-window' : exe " --new-window"
-                } else
-                    slot["launch"] := path != "" ? '"' path '"' : exe
+                if Layouts.Browsers.Has(StrLower(exe))
+                    slot["title"] := Layouts.StableTitle(exe, title)
+                slot["launch"] := path != "" ? '"' path '"' : exe
                 slot["_title"] := title
                 slot["_hwnd"] := hwnd
                 out.Push(slot)
             }
         }
+        ; browsers: read each window's web address so the layout can reopen it
+        ; on its own (--new-window <url>)
+        active := WinExist("A")
+        for slot in out {
+            if !Layouts.Browsers.Has(StrLower(slot["exe"]))
+                continue
+            url := Layouts.BrowserUrl(slot["_hwnd"])
+            slot["_url"] := url
+            slot["launch"] .= " --new-window" (url != "" ? ' "' url '"' : "")
+        }
+        if active
+            try WinActivate(active)
         return out
+    }
+
+    ; Address-bar URL of a browser window (focuses it briefly; clipboard is restored).
+    static BrowserUrl(hwnd) {
+        saved := ClipboardAll()
+        A_Clipboard := ""
+        url := ""
+        try {
+            WinActivate(hwnd)
+            if WinWaitActive(hwnd, , 1) {
+                Send("^l")
+                Sleep(120)
+                Send("^c")
+                if ClipWait(0.6)
+                    url := Trim(A_Clipboard)
+                Send("{Esc}")
+                Sleep(60)
+            }
+        }
+        A_Clipboard := saved
+        return (RegExMatch(url, "i)^[a-z][\w+.-]*:\S+$")) ? url : ""
+    }
+
+    ; Part of a browser title that won't change much: site names usually come
+    ; last ("Some video - YouTube" -> "YouTube").
+    static StableTitle(exe, title) {
+        t := Layouts.CleanTitle(exe, title)
+        parts := StrSplit(RegExReplace(t, "\s+[-|—·]\s+", "`n"), "`n", " `t")
+        return parts.Length > 1 && parts[parts.Length] != "" ? parts[parts.Length] : t
     }
 
     static CleanTitle(exe, title) {

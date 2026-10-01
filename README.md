@@ -33,6 +33,7 @@ The easy way is to capture what's already on screen:
 1. Arrange your windows by hand exactly how you want them.
 2. In Alcadeias: **+ New → Layout…**, give it a name, press **Record** and hit the hotkey you want (e.g. `Ctrl+Alt+1`).
 3. Press **Capture screen**, untick any windows you don't want, then **Use these**.
+   Capture also records how to **reopen** each window, so later the layout works even when everything is closed. Apps get their program path. For Chrome, Alcadeias briefly flips to each window and reads its web address, so it can reopen that exact page (your clipboard is restored afterwards).
 4. Press **Test it now**, then **Save**.
 
 You can fine-tune each window afterwards (double-click it in the list):
