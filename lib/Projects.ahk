@@ -191,14 +191,15 @@ class Picker {
             r && r <= rows.Length ? (result := rows[r], f.Close(true)) : 0)
         f.Buttons(pick, "Choose")
         ; arrows move the list while typing
-        HotIfWinActive("ahk_id " f.g.Hwnd)
+        hwnd := f.g.Hwnd   ; the window is gone after ShowModal
+        HotIfWinActive("ahk_id " hwnd)
         Hotkey("Up", (*) => Picker._Move(lv, -1), "On")
         Hotkey("Down", (*) => Picker._Move(lv, 1), "On")
         HotIf()
         fill()
         q.Focus()
         f.ShowModal()
-        HotIfWinActive("ahk_id " f.g.Hwnd)
+        HotIfWinActive("ahk_id " hwnd)
         try Hotkey("Up", "Off")
         try Hotkey("Down", "Off")
         HotIf()

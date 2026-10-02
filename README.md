@@ -6,7 +6,7 @@ One dashboard for everything that speeds up your desktop: your AutoHotkey script
 - **Inbox**: Downloads and Desktop as a to-do list. **Ctrl+M** moves files to the right folder. It learns where each kind of file goes, suggests that next time, and **Ctrl+Z** undoes.
 - **Auto-sort**: rules like "`mp4 mov` → Footage", "`zip` → unzip", "anything older than 30 days → Recycle Bin", run automatically or on demand. Right-click an inbox file for a one-click "always move .mp4 files here".
 - **Paste** (**Ctrl+Alt+V**): your saved snippets and the last 100 things you copied, searchable. Enter pastes into the window you came from. Snippets can have abbreviations: type `;desc` anywhere and it becomes your full video description. Copies from password managers are never recorded.
-- **Razer key map**: your macro keyboard's `macros.ini` as a proper editor (Setup → Scripts → your Razer script → *Key map*). A key can also run any Alcadeias item.
+- **Razer key map**: a picture of your Razer Cynosa Chroma (Nordic ISO) showing what every key does, per app (Setup → Scripts → your Razer script → *Key map*). Hover a key for details, click it to pick a new job from a searchable list (layouts, projects, folders, snippets, the script's own functions, websites, keys, text). With live detection on, pressing a Razer key lights it up. The layout lives in `assets/keyboards/` (JSON + SVG).
 - **Projects**: one item per project (its folder, files and links to open, a layout). One key or search opens all of it.
 - **Templates**: "New Video project…" copies your skeleton folder, fills in the name and date, and opens the result as a project.
 - **Browse in the dashboard**: Tab into any folder, type to filter, Backspace to go up. Newest files first.
@@ -114,6 +114,15 @@ Nothing needs setting up to start, because Alcadeias learns as you go.
 A **script's own hotkey** (set via Edit) turns that script on and off, like your `F8::Suspend`, but for any script.
 
 ---
+
+## Razer key map: getting the key names right
+
+Synapse sends a *name* for each key (like `numpad5` or `semicolon`), and those names are whatever was set up in Synapse. Alcadeias starts with sensible guesses. To make them exact:
+
+1. Open the key map and press **Turn on live key detection**. Alcadeias adds two logging lines to `HandleKey()` in your Razer script; the old version goes to Backups first.
+2. Press **Learn key names**, then press keys on the Razer. Known keys light up. For an unknown one it says *"Got 'xyz', click that key on the picture"*. Click it, and that's saved.
+
+Colors: violet = does something in the app you're looking at, grey = only in another app, amber = built into the script (bind, reload, cheat sheet…), teal = numpad folder warp.
 
 ## Run an item from anywhere
 

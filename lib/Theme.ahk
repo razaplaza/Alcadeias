@@ -33,7 +33,7 @@ class Theme {
         g := Gui(opts, title)
         g.BackColor := Theme.Bg
         g.MarginX := 0, g.MarginY := 0
-        g.SetFont("s10 c" Theme.Text, Theme.Font)
+        g.SetFont("q5 s10 c" Theme.Text, Theme.Font)
         return g
     }
 
@@ -49,15 +49,15 @@ class Theme {
 
     ; Text label.
     static Label(g, opts, text, color := "", size := 10, bold := false) {
-        c := g.Add("Text", opts " BackgroundTrans", text)
-        c.SetFont("s" size " c" (color != "" ? color : Theme.Text) (bold ? " w600" : " w400"), Theme.Font)
+        c := g.Add("Text", opts " Background" Theme.Bg, text)
+        c.SetFont("q5 s" size " c" (color != "" ? color : Theme.Text) (bold ? " w600" : " w400"), Theme.Font)
         return c
     }
 
     ; Single-line or multi-line input.
     static Edit(g, opts, text := "", mono := false) {
         c := g.Add("Edit", opts " -E0x200 Background" Theme.Panel2, text)
-        c.SetFont("s10 c" Theme.Text, mono ? Theme.Mono : Theme.Font)
+        c.SetFont("q5 s10 c" Theme.Text, mono ? Theme.Mono : Theme.Font)
         Theme.SetTheme(c.Hwnd, "DarkMode_CFD")
         return c
     }
@@ -69,7 +69,7 @@ class Theme {
 
     static DDL(g, opts, items) {
         c := g.Add("DropDownList", opts " Background" Theme.Panel2, items)
-        c.SetFont("s10 c" Theme.Text, Theme.Font)
+        c.SetFont("q5 s10 c" Theme.Text, Theme.Font)
         Theme.SetTheme(c.Hwnd, "DarkMode_CFD")
         return c
     }
@@ -77,7 +77,7 @@ class Theme {
     ; Dark list view with roomy rows.
     static ListView(g, opts, cols, rowHeight := 30, multi := false) {
         lv := g.Add("ListView", opts (multi ? "" : " -Multi") " -E0x200 +LV0x10000 Background" Theme.Panel, cols)
-        lv.SetFont("s10 c" Theme.Text, Theme.Font)
+        lv.SetFont("q5 s10 c" Theme.Text, Theme.Font)
         Theme.SetTheme(lv.Hwnd, "DarkMode_Explorer")
         hdr := SendMessage(0x101F, 0, 0, lv)   ; LVM_GETHEADER
         if hdr
@@ -105,7 +105,7 @@ class FlatButton {
         this.active := false
         this.SetColors(kind)
         this.ctrl := g.Add("Text", opts " 0x200 Center Background" this.bg, text)
-        this.ctrl.SetFont("s10 c" this.fg " w600", Theme.Font)
+        this.ctrl.SetFont("q5 s10 c" this.fg " w600", Theme.Font)
         this.onClick := onClick
         this.ctrl.OnEvent("Click", (*) => this.onClick.Call(this))
         FlatButton.Registry[this.ctrl.Hwnd] := this
@@ -203,8 +203,8 @@ class Toggle {
         this.label := text
         this.v := value ? 1 : 0
         this.onChange := onChange
-        this.ctrl := g.Add("Text", opts " 0x200 BackgroundTrans", "")
-        this.ctrl.SetFont("s10 c" Theme.Text, "Segoe UI Symbol")
+        this.ctrl := g.Add("Text", opts " 0x200 Background" Theme.Bg, "")
+        this.ctrl.SetFont("q5 s10 c" Theme.Text, "Segoe UI Symbol")
         this.ctrl.OnEvent("Click", (*) => this.Set(!this.v, true))
         this._Draw()
     }

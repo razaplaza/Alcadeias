@@ -1,0 +1,1057 @@
+{
+ "name": "Razer Cynosa Chroma (Nordic ISO)",
+ "width": 22.5,
+ "height": 6.25,
+ "keys": [
+  {
+   "id": "Esc",
+   "legend": "Esc",
+   "name": "Esc",
+   "x": 0,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F1",
+   "legend": "F1",
+   "name": "F1",
+   "x": 2,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F2",
+   "legend": "F2",
+   "name": "F2",
+   "x": 3,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F3",
+   "legend": "F3",
+   "name": "F3",
+   "x": 4,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F4",
+   "legend": "F4",
+   "name": "F4",
+   "x": 5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F5",
+   "legend": "F5",
+   "name": "F5",
+   "x": 6.5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F6",
+   "legend": "F6",
+   "name": "F6",
+   "x": 7.5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F7",
+   "legend": "F7",
+   "name": "F7",
+   "x": 8.5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F8",
+   "legend": "F8",
+   "name": "F8",
+   "x": 9.5,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F9",
+   "legend": "F9",
+   "name": "F9",
+   "x": 11,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F10",
+   "legend": "F10",
+   "name": "F10",
+   "x": 12,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F11",
+   "legend": "F11",
+   "name": "F11",
+   "x": 13,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F12",
+   "legend": "F12",
+   "name": "F12",
+   "x": 14,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "PrtSc",
+   "legend": "PrtSc",
+   "name": "PrintScreen",
+   "x": 15.25,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "ScrLk",
+   "legend": "ScrLk",
+   "name": "ScrollLock",
+   "x": 16.25,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Pause",
+   "legend": "Pause",
+   "name": "Pause",
+   "x": 17.25,
+   "y": 0,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Pipe",
+   "legend": "|",
+   "name": "tilde",
+   "x": 0,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D1",
+   "legend": "1",
+   "name": "1",
+   "x": 1,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D2",
+   "legend": "2",
+   "name": "2",
+   "x": 2,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D3",
+   "legend": "3",
+   "name": "3",
+   "x": 3,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D4",
+   "legend": "4",
+   "name": "4",
+   "x": 4,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D5",
+   "legend": "5",
+   "name": "5",
+   "x": 5,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D6",
+   "legend": "6",
+   "name": "6",
+   "x": 6,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D7",
+   "legend": "7",
+   "name": "7",
+   "x": 7,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D8",
+   "legend": "8",
+   "name": "8",
+   "x": 8,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D9",
+   "legend": "9",
+   "name": "9",
+   "x": 9,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D0",
+   "legend": "0",
+   "name": "0",
+   "x": 10,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Plus",
+   "legend": "+",
+   "name": "minus",
+   "x": 11,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Backslash",
+   "legend": "\\",
+   "name": "plus",
+   "x": 12,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Backspace",
+   "legend": "Back",
+   "name": "Backspace",
+   "x": 13,
+   "y": 1.25,
+   "w": 2,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Ins",
+   "legend": "Ins",
+   "name": "Insert",
+   "x": 15.25,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Home",
+   "legend": "Home",
+   "name": "Home",
+   "x": 16.25,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "PgUp",
+   "legend": "PgUp",
+   "name": "PgUp",
+   "x": 17.25,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumLock",
+   "legend": "Num",
+   "name": "NumLock",
+   "x": 18.5,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumDiv",
+   "legend": "/",
+   "name": "numpadDiv",
+   "x": 19.5,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumMult",
+   "legend": "*",
+   "name": "numpadMult",
+   "x": 20.5,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumSub",
+   "legend": "-",
+   "name": "numpadSub",
+   "x": 21.5,
+   "y": 1.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Tab",
+   "legend": "Tab",
+   "name": "Tab",
+   "x": 0,
+   "y": 2.25,
+   "w": 1.5,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Q",
+   "legend": "Q",
+   "name": "q",
+   "x": 1.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "W",
+   "legend": "W",
+   "name": "w",
+   "x": 2.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "E",
+   "legend": "E",
+   "name": "e",
+   "x": 3.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "R",
+   "legend": "R",
+   "name": "r",
+   "x": 4.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "T",
+   "legend": "T",
+   "name": "t",
+   "x": 5.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Y",
+   "legend": "Y",
+   "name": "y",
+   "x": 6.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "U",
+   "legend": "U",
+   "name": "u",
+   "x": 7.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "I",
+   "legend": "I",
+   "name": "i",
+   "x": 8.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "O",
+   "legend": "O",
+   "name": "o",
+   "x": 9.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "P",
+   "legend": "P",
+   "name": "p",
+   "x": 10.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "AA",
+   "legend": "Å",
+   "name": "lbracket",
+   "x": 11.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Umlaut",
+   "legend": "¨",
+   "name": "rbracket",
+   "x": 12.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Enter",
+   "legend": "Enter",
+   "name": "Enter",
+   "x": 13.75,
+   "y": 2.25,
+   "w": 1.25,
+   "h": 2,
+   "bindable": true
+  },
+  {
+   "id": "Del",
+   "legend": "Del",
+   "name": "Delete",
+   "x": 15.25,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "End",
+   "legend": "End",
+   "name": "End",
+   "x": 16.25,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "PgDn",
+   "legend": "PgDn",
+   "name": "PgDn",
+   "x": 17.25,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num7",
+   "legend": "7",
+   "name": "numpad7",
+   "x": 18.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num8",
+   "legend": "8",
+   "name": "numpad8",
+   "x": 19.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num9",
+   "legend": "9",
+   "name": "numpad9",
+   "x": 20.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumAdd",
+   "legend": "+",
+   "name": "numpadAdd",
+   "x": 21.5,
+   "y": 2.25,
+   "w": 1,
+   "h": 2,
+   "bindable": true
+  },
+  {
+   "id": "Caps",
+   "legend": "Caps",
+   "name": "CapsLock",
+   "x": 0,
+   "y": 3.25,
+   "w": 1.75,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "A",
+   "legend": "A",
+   "name": "a",
+   "x": 1.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "S",
+   "legend": "S",
+   "name": "s",
+   "x": 2.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "D",
+   "legend": "D",
+   "name": "d",
+   "x": 3.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "F",
+   "legend": "F",
+   "name": "f",
+   "x": 4.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "G",
+   "legend": "G",
+   "name": "g",
+   "x": 5.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "H",
+   "legend": "H",
+   "name": "h",
+   "x": 6.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "J",
+   "legend": "J",
+   "name": "j",
+   "x": 7.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "K",
+   "legend": "K",
+   "name": "k",
+   "x": 8.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "L",
+   "legend": "L",
+   "name": "l",
+   "x": 9.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "OE",
+   "legend": "Ø",
+   "name": "semicolon",
+   "x": 10.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "AE",
+   "legend": "Æ",
+   "name": "quote",
+   "x": 11.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Apos",
+   "legend": "'",
+   "name": "backslash",
+   "x": 12.75,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num4",
+   "legend": "4",
+   "name": "numpad4",
+   "x": 18.5,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num5",
+   "legend": "5",
+   "name": "numpad5",
+   "x": 19.5,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num6",
+   "legend": "6",
+   "name": "numpad6",
+   "x": 20.5,
+   "y": 3.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "LShift",
+   "legend": "Shift",
+   "name": "LShift",
+   "x": 0,
+   "y": 4.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Less",
+   "legend": "<",
+   "name": "oem102",
+   "x": 1.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Z",
+   "legend": "Z",
+   "name": "z",
+   "x": 2.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "X",
+   "legend": "X",
+   "name": "x",
+   "x": 3.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "C",
+   "legend": "C",
+   "name": "c",
+   "x": 4.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "V",
+   "legend": "V",
+   "name": "v",
+   "x": 5.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "B",
+   "legend": "B",
+   "name": "b",
+   "x": 6.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "N",
+   "legend": "N",
+   "name": "n",
+   "x": 7.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "M",
+   "legend": "M",
+   "name": "m",
+   "x": 8.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Comma",
+   "legend": ",",
+   "name": "comma",
+   "x": 9.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Period",
+   "legend": ".",
+   "name": "period",
+   "x": 10.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Minus",
+   "legend": "-",
+   "name": "slash",
+   "x": 11.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "RShift",
+   "legend": "Shift",
+   "name": "RShift",
+   "x": 12.25,
+   "y": 4.25,
+   "w": 2.75,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Up",
+   "legend": "↑",
+   "name": "Up",
+   "x": 16.25,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num1",
+   "legend": "1",
+   "name": "numpad1",
+   "x": 18.5,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num2",
+   "legend": "2",
+   "name": "numpad2",
+   "x": 19.5,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num3",
+   "legend": "3",
+   "name": "numpad3",
+   "x": 20.5,
+   "y": 4.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumEnter",
+   "legend": "Ent",
+   "name": "numpadEnter",
+   "x": 21.5,
+   "y": 4.25,
+   "w": 1,
+   "h": 2,
+   "bindable": true
+  },
+  {
+   "id": "LCtrl",
+   "legend": "Ctrl",
+   "name": "LCtrl",
+   "x": 0,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "LWin",
+   "legend": "Win",
+   "name": "LWin",
+   "x": 1.25,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "LAlt",
+   "legend": "Alt",
+   "name": "LAlt",
+   "x": 2.5,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Space",
+   "legend": "",
+   "name": "Space",
+   "x": 3.75,
+   "y": 5.25,
+   "w": 6.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "AltGr",
+   "legend": "AltGr",
+   "name": "RAlt",
+   "x": 10,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Fn",
+   "legend": "Fn",
+   "name": "Fn",
+   "x": 11.25,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": false
+  },
+  {
+   "id": "Menu",
+   "legend": "Menu",
+   "name": "AppsKey",
+   "x": 12.5,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "RCtrl",
+   "legend": "Ctrl",
+   "name": "RCtrl",
+   "x": 13.75,
+   "y": 5.25,
+   "w": 1.25,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Left",
+   "legend": "←",
+   "name": "Left",
+   "x": 15.25,
+   "y": 5.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Down",
+   "legend": "↓",
+   "name": "Down",
+   "x": 16.25,
+   "y": 5.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Right",
+   "legend": "→",
+   "name": "Right",
+   "x": 17.25,
+   "y": 5.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "Num0",
+   "legend": "0",
+   "name": "numpad0",
+   "x": 18.5,
+   "y": 5.25,
+   "w": 2,
+   "h": 1,
+   "bindable": true
+  },
+  {
+   "id": "NumDot",
+   "legend": ",",
+   "name": "numpadDot",
+   "x": 20.5,
+   "y": 5.25,
+   "w": 1,
+   "h": 1,
+   "bindable": true
+  }
+ ]
+}

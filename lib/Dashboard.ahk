@@ -38,7 +38,7 @@ class Dashboard {
         Dashboard.g := g
         Theme.DarkTitle(g)
 
-        Dashboard.title := Theme.Label(g, "x24 y20 w300 h34", "Alcadeias", Theme.Text, 18, true)
+        Dashboard.title := Theme.Label(g, "x24 y22 w300 h32", "Alcadeias", Theme.Text, 17, true)
         Dashboard.summary := Theme.Label(g, "x26 y56 w700 h20", "", Theme.Warn, 9)
         Dashboard.summary.OnEvent("Click", (*) => Dashboard.ShowProblems())
         Dashboard.btn["settings"] := FlatButton(g, "x0 y20 w120 h36", "Settings", (*) => Dialogs.Settings())

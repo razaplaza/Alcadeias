@@ -86,8 +86,16 @@ class KeyMap {
         return out
     }
 
-    ; The editor window.
+    ; Visual keyboard when a layout is available, else the list.
     static Open(item) {
+        if FileExist(Keyboard.LayoutFile)
+            Keyboard.Open(item)
+        else
+            KeyMap.OpenList(item)
+    }
+
+    ; The list editor.
+    static OpenList(item) {
         ini := KeyMap.IniFor(item)
         if (ini = "")
             return

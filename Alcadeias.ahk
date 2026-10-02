@@ -25,6 +25,7 @@ A_MaxHotkeysPerInterval := 400
 #Include lib\Rules.ahk
 #Include lib\Paste.ahk
 #Include lib\KeyMap.ahk
+#Include lib\Keyboard.ahk
 #Include lib\Actions.ahk
 #Include lib\Editor.ahk
 #Include lib\Dialogs.ahk
