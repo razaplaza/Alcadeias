@@ -157,6 +157,7 @@ The Razer key map writes this for you when you choose *Run an Alcadeias item*.
 
 - **The interface runs on WebView2**, the engine built into Windows 10/11 (the same as Edge). If it ever can't start, Alcadeias opens its classic window instead, and Settings → *Classic window* forces that. The calendar and ideas live in `data\calendar.json` and `data\ideas.json`.
 
+- **Tray icons:** Alcadeias hides the tray icons of the scripts it manages, so only its own icon shows (Settings → *Hide my scripts' tray icons*). The scripts themselves aren't changed.
 - **Your scripts are separate programs.** Closing Alcadeias, or Alcadeias crashing, doesn't stop them.
 - **Prefer VS Code or another editor?** Set it in Settings → *External editor*. When you save a file there, Alcadeias picks it up and applies it automatically (*Auto-apply*, on by default per script). The same error check applies.
 - **Backups:** every save from the editor keeps the previous version in `data\backups\<script name>\` (the last 30). Right-click a script → *Open backups folder*.

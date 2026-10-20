@@ -48,6 +48,8 @@ class App {
         Scripts.StartAutostart()
         SetTimer(() => Scripts.Watch(), 1000)
         Rules.Start()
+        Scripts.HideIcons()
+        SetTimer(ObjBindMethod(Scripts, "HideIcons"), 10000)   ; icons return if Explorer restarts
         OnMessage(0x4A, ObjBindMethod(App, "_OnCopyData"))
         Dashboard.Build()
         UI.Start()

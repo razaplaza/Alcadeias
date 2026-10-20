@@ -112,7 +112,34 @@ class Scripts {
         catch as e
             return Scripts._Fail(item, e.Message)
         Scripts._mtimes[item["path"]] := FileGetTime(item["path"], "M")
+        ; the new copy's tray icon appears a moment after launch
+        for ms in [400, 1200, 3000]
+            SetTimer(ObjBindMethod(Scripts, "HideIcons"), -ms)
         return true
+    }
+
+    ; ---- tray icons -----------------------------------------------------
+
+    ; Removes the tray icons of the scripts Alcadeias manages (setting on).
+    ; Nothing in the scripts changes; restarting a script brings its icon back.
+    static HideIcons() {
+        if !Store.Setting("hideScriptIcons", 1)
+            return
+        managed := Map()
+        for item in Store.OfType("script")
+            managed[StrLower(item["path"])] := true
+        for path, info in Scripts.Running()
+            if managed.Has(path)
+                Scripts.HideIcon(info.hwnd)
+    }
+
+    ; AutoHotkey registers its icon with uID = AHK_NOTIFYICON (WM_USER + 4).
+    static HideIcon(hwnd) {
+        nid := Buffer(A_PtrSize = 8 ? 976 : 956, 0)   ; NOTIFYICONDATAW
+        NumPut("UInt", nid.Size, nid, 0)
+        NumPut("Ptr", hwnd, nid, A_PtrSize)
+        NumPut("UInt", 0x404, nid, 2 * A_PtrSize)
+        return DllCall("shell32\Shell_NotifyIconW", "UInt", 2, "Ptr", nid)   ; NIM_DELETE
     }
 
     static Stop(item) {

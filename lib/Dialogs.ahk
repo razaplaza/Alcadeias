@@ -773,6 +773,19 @@ class Dialogs {
         return result
     }
 
+    ; Turning icons back on: restart the scripts so they show theirs again.
+    static _IconsChanged(st, newValue) {
+        old := st["hideScriptIcons"]
+        st["hideScriptIcons"] := newValue
+        if (old && !newValue) {
+            running := Scripts.Running()
+            for item in Store.OfType("script")
+                if running.Has(StrLower(item["path"]))
+                    Scripts.Apply(item, false)
+        } else if newValue
+            Scripts.HideIcons()
+    }
+
     static _Lines(text) {
         out := []
         for l in StrSplit(text, "`n", " `r`t")
@@ -931,6 +944,7 @@ class Dialogs {
         startWin := f.Toggle("Start Alcadeias with Windows", st["startWithWindows"])
         startHidden := f.Toggle("Start hidden (open with the hotkey or the tray icon)", st["startHidden"])
         classicUI := f.Toggle("Classic window (after a restart)", st["classicUI"])
+        hideIcons := f.Toggle("Hide my scripts' tray icons", st["hideScriptIcons"])
 
         f.Section("Hotkeys")
         pasteHk := HotkeyField(f, st["pasteHotkey"], "__paste", "Paste hotkey")
@@ -985,6 +999,7 @@ class Dialogs {
             st["pasteHotkey"] := pasteHk.Value,
             st["ideaHotkey"] := ideaHk.Value,
             st["classicUI"] := classicUI.Value,
+            Dialogs._IconsChanged(st, hideIcons.Value),
             st["saveClipboard"] := saveClip.Value,
             st["inboxFolders"] := Dialogs._Lines(inbox.Value),
             Store.Save(),

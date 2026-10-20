@@ -57,6 +57,7 @@ class Store {
             "inboxFolders", ["%DOWNLOADS%", "%DESKTOP%"],
             "pasteHotkey", "^!v",
             "ideaHotkey", "^+s",
+            "hideScriptIcons", 1,
             "classicUI", 0,
             "saveClipboard", 1,
             "autoSort", 1
