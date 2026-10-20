@@ -66,10 +66,29 @@ You get a separate Claude window without tabs or an address bar, and the layout 
 
 ## How it's organized
 
-Two places on the left, three tabs each:
+Three tabs along the top, each with its own sub-tabs:
 
-- **Work** (daily): **Find** (search anything) · **Inbox** (put new files away; *Auto-sort…* holds the rules) · **Projects** (open a whole job at once; templates live here too) · **Paste** (snippets + clipboard history)
+- **Work** (daily): **Find** · **Inbox** · **Projects** · **Paste**
 - **Setup** (configure once): **Layouts** · **Scripts** · **Apps & links**
+- **Plan**: **Calendar** · **Ideas**
+
+Ctrl+1 / 2 / 3 jumps between Work, Setup and Plan; Ctrl+Tab goes to the next sub-tab.
+
+## Calendar
+
+- **Week** always shows Monday to Sunday of the current week; **Today** shows one day; **Month** shows the month (click a day to open it).
+- The gear sets when your day starts and ends. It can run past midnight: with 11:00 → 01:00, a task at 00:30 belongs to the day that started the evening before.
+- **+** adds a task: title, description, date, start and end, and a color label (create labels right there). Blocks are placed to the minute, so a 35-minute task covers exactly 35 minutes.
+- Click a task to edit it; right-click for Edit / Delete. **Ctrl+drag** moves it (also to another day); **Ctrl+drag its bottom edge** changes the end time.
+- ← / → move a week (or month/day), clicking the title jumps back to now.
+
+## Idea cards
+
+Press **Ctrl+Shift+S** anywhere: a small box opens. Type the idea, pick **S / A / B / C** (or Ctrl+1–4), add tags with **+** (type a new name to create one), **Enter** saves, Shift+Enter makes a new line, Esc closes. The box remembers your last tier.
+
+Plan → **Ideas** shows them as a tier list: drag cards between tiers or reorder them, click a card to edit, right-click for Done / Archive / Schedule (turns it into a calendar task) / Delete. Filter by clicking tags, search on the right, the box icon shows archived cards.
+
+Heads-up: Ctrl+Shift+S is "Save as" in many programs; while Alcadeias runs it opens the idea box instead. Change it in Settings → Hotkeys if that gets in the way.
 
 ## Your files, the low-effort way
 
@@ -136,6 +155,8 @@ The Razer key map writes this for you when you choose *Run an Alcadeias item*.
 
 ## Good to know
 
+- **The interface runs on WebView2**, the engine built into Windows 10/11 (the same as Edge). If it ever can't start, Alcadeias opens its classic window instead, and Settings → *Classic window* forces that. The calendar and ideas live in `data\calendar.json` and `data\ideas.json`.
+
 - **Your scripts are separate programs.** Closing Alcadeias, or Alcadeias crashing, doesn't stop them.
 - **Prefer VS Code or another editor?** Set it in Settings → *External editor*. When you save a file there, Alcadeias picks it up and applies it automatically (*Auto-apply*, on by default per script). The same error check applies.
 - **Backups:** every save from the editor keeps the previous version in `data\backups\<script name>\` (the last 30). Right-click a script → *Open backups folder*.
@@ -149,7 +170,9 @@ The Razer key map writes this for you when you choose *Run an Alcadeias item*.
 
 ```
 Alcadeias.ahk        start here
-lib\                 the app (Dashboard, Editor, Layouts, Scripts, ...)
+lib\                 the app (Dashboard, Editor, Layouts, Scripts, UI host, ...)
+lib\vendor\          WebView2 library (thqby/ahk2_lib, MIT) + Microsoft's WebView2Loader.dll
+ui\                  the interface pages (HTML/CSS/JS shown inside Alcadeias)
 assets\              icon
 data\                your setup + backups (created on first run, not in git)
 scripts\             default home for new scripts (not in git)

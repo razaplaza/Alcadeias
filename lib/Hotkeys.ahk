@@ -13,10 +13,13 @@ class Hotkeys {
         Hotkeys.Errors := []
         dh := Store.Setting("dashboardHotkey")
         if (dh != "")
-            wanted[dh] := (*) => Dashboard.Toggle()
+            wanted[dh] := (*) => UI.Toggle()
         ph := Store.Setting("pasteHotkey")
         if (ph != "" && !wanted.Has(ph))
-            wanted[ph] := (*) => Dashboard.ShowTab("paste")
+            wanted[ph] := (*) => UI.ShowTab("paste")
+        ih := Store.Setting("ideaHotkey", "^+s")
+        if (ih != "" && !wanted.Has(ih))
+            wanted[ih] := (*) => UI.Capture()
         for item in Store.Items {
             hk := item["hotkey"]
             if (hk = "")
@@ -172,6 +175,8 @@ class Hotkeys {
             out.Push("the dashboard hotkey")
         if (exceptId != "__paste" && Hotkeys.Normalize(Store.Setting("pasteHotkey")) = n)
             out.Push("the Paste hotkey")
+        if (exceptId != "__idea" && Hotkeys.Normalize(Store.Setting("ideaHotkey", "^+s")) = n)
+            out.Push("the New idea hotkey")
         for item in Store.Items {
             if (item["id"] = exceptId)
                 continue

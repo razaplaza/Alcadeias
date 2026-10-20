@@ -30,6 +30,8 @@ A_MaxHotkeysPerInterval := 400
 #Include lib\Editor.ahk
 #Include lib\Dialogs.ahk
 #Include lib\Dashboard.ahk
+#Include lib\UI.ahk
+#Include lib\vendor\WebView2\WebView2.ahk
 
 App.Start()
 
@@ -48,12 +50,13 @@ class App {
         Rules.Start()
         OnMessage(0x4A, ObjBindMethod(App, "_OnCopyData"))
         Dashboard.Build()
+        UI.Start()
         hidden := Store.Setting("startHidden")
         for arg in A_Args
             if (arg = "/tray")
                 hidden := true
         if !hidden
-            Dashboard.Show()
+            UI.Show()
         if Hotkeys.Errors.Length
             App.Status("Hotkey problem: " Hotkeys.Errors[1], "warn")
     }
@@ -63,8 +66,9 @@ class App {
         try TraySetIcon(A_ScriptDir "\assets\alcadeias.ico")
         m := A_TrayMenu
         m.Delete()
-        m.Add("Open Alcadeias", (*) => Dashboard.Show())
-        m.Add("Settings…", (*) => (Dashboard.Show(), Dialogs.Settings()))
+        m.Add("Open Alcadeias", (*) => UI.Show())
+        m.Add("New idea", (*) => UI.Capture())
+        m.Add("Settings…", (*) => (UI.Show(), Dialogs.Settings()))
         m.Add()
         m.Add("Reload Alcadeias", (*) => Reload())
         m.Add("Exit (your scripts keep running)", (*) => ExitApp())
@@ -80,7 +84,8 @@ class App {
             Dashboard.statusText.SetFont("c" color)
             Dashboard.statusText.Text := msg
         }
-        if (!Dashboard.IsVisible() && (toast || kind = "error" || kind = "warn"))
+        UI.Status(msg, kind)
+        if (!Dashboard.IsVisible() && !UI.IsMainVisible() && (toast || kind = "error" || kind = "warn"))
             App.Toast(msg, color)
     }
 

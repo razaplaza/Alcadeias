@@ -223,7 +223,7 @@ class HotkeyField {
 }
 
 class Dialogs {
-    static Owner() => (Dashboard.g && Dashboard.IsVisible()) ? Dashboard.g : ""
+    static Owner() => UI.OwnerGui()
 
     static EditItem(item, isNew) {
         switch item["type"] {
@@ -930,9 +930,11 @@ class Dialogs {
         hk := HotkeyField(f, st["dashboardHotkey"], "__dashboard", "Open Alcadeias")
         startWin := f.Toggle("Start Alcadeias with Windows", st["startWithWindows"])
         startHidden := f.Toggle("Start hidden (open with the hotkey or the tray icon)", st["startHidden"])
+        classicUI := f.Toggle("Classic window (after a restart)", st["classicUI"])
 
-        f.Section("Paste")
+        f.Section("Hotkeys")
         pasteHk := HotkeyField(f, st["pasteHotkey"], "__paste", "Paste hotkey")
+        ideaHk := HotkeyField(f, st["ideaHotkey"], "__idea", "New idea hotkey")
         saveClip := f.Toggle("Remember clipboard history after restarts", st["saveClipboard"])
         f.Hint("Kept in data\clipboard.json. Copies from password managers are never recorded.")
 
@@ -981,6 +983,8 @@ class Dialogs {
             st["vdaPath"] := Trim(vdaEdit.Value, " `t`""),
             st["everythingExclude"] := Trim(evEx.Value),
             st["pasteHotkey"] := pasteHk.Value,
+            st["ideaHotkey"] := ideaHk.Value,
+            st["classicUI"] := classicUI.Value,
             st["saveClipboard"] := saveClip.Value,
             st["inboxFolders"] := Dialogs._Lines(inbox.Value),
             Store.Save(),

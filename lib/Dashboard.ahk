@@ -20,6 +20,8 @@ class Dashboard {
     static btn := Map()
     static actions := Map()
     static _refreshPending := false
+    static queryText := ""      ; current search text (native box or web UI)
+    static _webSel := ""        ; rows chosen in the web UI while an action runs
     static _inboxCount := 0
     static _ticks := 0
 
@@ -140,6 +142,7 @@ class Dashboard {
     }
 
     static Hide() {
+        UI.HideMain()
         if Dashboard.g
             Dashboard.g.Hide()
     }
@@ -199,6 +202,8 @@ class Dashboard {
     ; ---- categories & browsing -------------------------------------------
 
     static SetCategory(key, refresh := true) {
+        if refresh
+            UI.Event("tab", key)
         if (key = "all" || key = "files")
             key := "find"
         Dashboard.category := key
@@ -340,11 +345,13 @@ class Dashboard {
     ; ---- building the list -------------------------------------------------
 
     static Refresh() {
-        if !Dashboard.g
+        UI.Changed()
+        if !Dashboard.g || (UI.Live() && !Dashboard.IsVisible())
             return
         Dashboard._refreshPending := false
         lv := Dashboard.lv
         selKey := Dashboard._RowKey(Dashboard.SelectedRow())
+        Dashboard.queryText := Dashboard.search.Value
         q := Trim(StrLower(Dashboard.search.Value))
         tokens := q = "" ? "" : StrSplit(RegExReplace(q, "\s+", " "), " ")
         running := Scripts.Running()
@@ -374,6 +381,7 @@ class Dashboard {
     }
 
     static RefreshSoon(ms := 50) {
+        UI.Changed()
         if !Dashboard.g
             return
         Dashboard._refreshPending := true
@@ -460,7 +468,7 @@ class Dashboard {
                 Dashboard._AddEverything(rows, seen, q, 120)
         }
         if !rows.Length
-            rows.Push(Dashboard.Msg(tokens ? "No matches for '" Dashboard.search.Value "'" : "Nothing here yet. Press + New (Ctrl+N) to add one."))
+            rows.Push(Dashboard.Msg(tokens ? "No matches" : "Nothing here yet"))
         return rows
     }
 
@@ -690,6 +698,8 @@ class Dashboard {
     ; ---- selection -----------------------------------------------------------
 
     static SelectedRow() {
+        if (Dashboard._webSel is Array)
+            return Dashboard._webSel.Length ? Dashboard._webSel[1] : ""
         if !Dashboard.lv
             return ""
         i := Dashboard.lv.GetNext(0)
@@ -697,6 +707,8 @@ class Dashboard {
     }
 
     static SelectedRows() {
+        if (Dashboard._webSel is Array)
+            return Dashboard._webSel
         out := []
         i := 0
         while (i := Dashboard.lv.GetNext(i))
@@ -862,7 +874,7 @@ class Dashboard {
             App.Status("Select a file or folder first (Files, Inbox, or inside a folder)", "warn")
             return
         }
-        dest := Picker.Choose(paths.Length = 1 ? "Move '" Files.Name(paths[1]) "' to…" : "Move " paths.Length " items to…", paths[1], Dashboard.g)
+        dest := Picker.Choose(paths.Length = 1 ? "Move '" Files.Name(paths[1]) "' to…" : "Move " paths.Length " items to…", paths[1], UI.OwnerGui())
         if (dest = "")
             return
         Files.Move(paths, dest)

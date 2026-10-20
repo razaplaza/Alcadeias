@@ -56,6 +56,8 @@ class Store {
             "everythingExclude", "!\AppData\ !\$Recycle.Bin\ !\Windows\ !\node_modules\ !\.git\ !\Program Files",
             "inboxFolders", ["%DOWNLOADS%", "%DESKTOP%"],
             "pasteHotkey", "^!v",
+            "ideaHotkey", "^+s",
+            "classicUI", 0,
             "saveClipboard", 1,
             "autoSort", 1
         )

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Idea</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  html, body { background: var(--panel); }
+  .cap { display: flex; flex-direction: column; height: 100%; padding: 14px; gap: 10px; }
+  .cap textarea { flex: 1; resize: none; font-size: 16px; background: var(--bg); border-radius: 10px; padding: 12px 14px; line-height: 1.45; }
+  .caprow { display: flex; align-items: center; gap: 10px; }
+  .caprow .chips { flex: 1; }
+  #tagpop { position: fixed; min-width: 220px; max-height: 190px; overflow-y: auto; }
+  #tagpop input { width: 100%; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="cap">
+  <textarea id="t" placeholder="Idea" spellcheck="true"></textarea>
+  <div class="caprow">
+    <div class="tierpick" id="tiers"></div>
+    <div class="chips" id="chips"></div>
+    <span class="chip add" id="add" title="Tag">+</span>
+  </div>
+</div>
+<div id="tagpop" class="menu hidden"><input id="tq" type="text" placeholder="Tag" spellcheck="false"><div id="tlist"></div></div>
+<script src="bridge.js"></script>
+<script src="capture.js"></script>
+</body>
+</html>
